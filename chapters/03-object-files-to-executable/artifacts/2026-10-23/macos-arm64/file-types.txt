@@ -1,0 +1,4 @@
+main.o:          Mach-O 64-bit object arm64
+add.o:           Mach-O 64-bit object arm64
+libcalculator.a: current ar archive random library
+calculator:      Mach-O 64-bit executable arm64

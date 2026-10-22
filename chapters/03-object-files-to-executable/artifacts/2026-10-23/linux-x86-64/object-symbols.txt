@@ -1,0 +1,14 @@
+
+main.o:
+                 U __errno_location
+                 U add
+                 U fprintf
+                 U fwrite
+0000000000000094 T main
+0000000000000000 t parse_int
+                 U printf
+                 U stderr
+                 U strtol
+
+add.o:
+0000000000000000 T add

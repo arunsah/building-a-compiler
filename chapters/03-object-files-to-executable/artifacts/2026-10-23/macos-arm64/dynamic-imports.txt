@@ -1,0 +1,7 @@
+calculator [arm64]:
+    -imports:
+      0x0000  ___error  (from libSystem)
+      0x0001  ___stderrp  (from libSystem)
+      0x0002  _fprintf  (from libSystem)
+      0x0003  _printf  (from libSystem)
+      0x0004  _strtol  (from libSystem)

@@ -1,0 +1,22 @@
+
+main.o:
+                 U ___error
+                 U ___stderrp
+                 U _add
+                 U _fprintf
+0000000000000000 T _main
+0000000000000134 t _parse_int
+                 U _printf
+                 U _strtol
+0000000000000214 s l_.str
+000000000000022a s l_.str.1
+0000000000000260 s l_.str.2
+0000000000000289 s l_.str.3
+0000000000000000 t ltmp0
+0000000000000214 s ltmp1
+0000000000000298 s ltmp2
+
+add.o:
+0000000000000000 T _add
+0000000000000000 t ltmp0
+00000000000000b0 s ltmp1

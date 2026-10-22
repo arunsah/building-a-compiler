@@ -1,0 +1,36 @@
+# Path: calculator
+# Arch: arm64
+# Object files:
+[  0] linker synthesized
+[  1] main.o
+[  2] add.o
+[  3] /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libSystem.tbd
+[  4] /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/system/libsystem_c.tbd
+[  5] /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/system/libsystem_kernel.tbd
+# Sections:
+# Address	Size    	Segment	Section
+0x100000460	0x000002C4	__TEXT	__text
+0x100000724	0x00000030	__TEXT	__stubs
+0x100000754	0x00000083	__TEXT	__cstring
+0x1000007D8	0x00000060	__TEXT	__unwind_info
+0x100004000	0x00000028	__DATA_CONST	__got
+# Symbols:
+# Address	Size    	File  Name
+0x100000000	0x00000000	[  0] __mh_execute_header
+0x100000460	0x00000134	[  1] _main
+0x100000594	0x000000E0	[  1] _parse_int
+0x100000674	0x000000B0	[  2] _add
+0x100000724	0x0000000C	[  5] ___error.stub
+0x100000730	0x0000000C	[  4] _fprintf.stub
+0x10000073C	0x0000000C	[  4] _printf.stub
+0x100000748	0x0000000C	[  4] _strtol.stub
+0x100000754	0x00000016	[  1] literal string: Usage: %s LEFT RIGHT\n
+0x10000076A	0x00000036	[  1] literal string: Both operands must be integers representable by int.\n
+0x1000007A0	0x00000029	[  1] literal string: The result is outside the range of int.\n
+0x1000007C9	0x0000000E	[  1] literal string: %d + %d = %d\n
+0x1000007D8	0x00000060	[  0] compact unwind info
+0x100004000	0x00000008	[  5] ___error.got
+0x100004008	0x00000008	[  4] ___stderrp.got
+0x100004010	0x00000008	[  4] _fprintf.got
+0x100004018	0x00000008	[  4] _printf.got
+0x100004020	0x00000008	[  4] _strtol.got

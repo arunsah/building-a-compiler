@@ -1,0 +1,2 @@
+__.SYMDEF SORTED
+add.o

@@ -56,3 +56,4 @@ dkms.conf
 
 # Published chapter artifacts are intentional snapshots.
 !chapters/**/artifacts/**/*.o
+!chapters/**/artifacts/**/*.a

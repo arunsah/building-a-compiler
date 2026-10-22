@@ -1,0 +1,31 @@
+main.o:
+Relocation information (__TEXT,__text) 24 entries
+address  pcrel length extern type    scattered symbolnum/value
+00000170 True  long   True   BR26    False     ___error
+00000168 True  long   True   BR26    False     _strtol
+00000154 True  long   True   BR26    False     ___error
+00000118 True  long   True   BR26    False     _printf
+00000114 False long   True   PAGOF12 False     l_.str.3
+00000110 True  long   True   PAGE21  False     l_.str.3
+000000dc True  long   True   BR26    False     _fprintf
+000000d8 False long   True   PAGOF12 False     l_.str.2
+000000d4 True  long   True   PAGE21  False     l_.str.2
+000000cc False long   True   GOTLDPOFFalse     ___stderrp
+000000c8 True  long   True   GOTLDP  False     ___stderrp
+000000bc True  long   True   BR26    False     _add
+000000a0 True  long   True   BR26    False     _fprintf
+0000009c False long   True   PAGOF12 False     l_.str.1
+00000098 True  long   True   PAGE21  False     l_.str.1
+00000090 False long   True   GOTLDPOFFalse     ___stderrp
+0000008c True  long   True   GOTLDP  False     ___stderrp
+00000080 True  long   True   BR26    False     _parse_int
+00000068 True  long   True   BR26    False     _parse_int
+0000004c True  long   True   BR26    False     _fprintf
+00000048 False long   True   PAGOF12 False     l_.str
+00000044 True  long   True   PAGE21  False     l_.str
+0000002c False long   True   GOTLDPOFFalse     ___stderrp
+00000028 True  long   True   GOTLDP  False     ___stderrp
+Relocation information (__LD,__compact_unwind) 2 entries
+address  pcrel length extern type    scattered symbolnum/value
+00000020 False ?( 3)  False  UNSIGND False     1 (__TEXT,__text)
+00000000 False ?( 3)  False  UNSIGND False     1 (__TEXT,__text)

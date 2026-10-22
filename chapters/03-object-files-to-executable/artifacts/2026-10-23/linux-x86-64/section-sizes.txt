@@ -1,0 +1,4 @@
+   text	   data	    bss	    dec	    hex	filename
+    653	      0	      0	    653	    28d	main.o
+    136	      0	      0	    136	     88	add.o
+   2364	    616	     16	   2996	    bb4	calculator

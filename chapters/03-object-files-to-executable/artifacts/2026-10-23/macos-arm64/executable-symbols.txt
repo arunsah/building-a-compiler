@@ -1,0 +1,9 @@
+                 U ___error
+                 U ___stderrp
+0000000100000000 T __mh_execute_header
+0000000100000674 T _add
+                 U _fprintf
+0000000100000460 T _main
+0000000100000594 t _parse_int
+                 U _printf
+                 U _strtol

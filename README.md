@@ -11,6 +11,7 @@ large compiler outputs inside the article.
 ## Chapters
 
 - Chapter 2: [From C source code to object files](chapters/02-c-source-code-to-object-files)
+- Chapter 3: [From object files to an executable](chapters/03-object-files-to-executable)
 
 ## Working on a chapter
 

@@ -1,0 +1,4 @@
+main.o:          ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped
+add.o:           ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped
+libcalculator.a: current ar archive
+calculator:      ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=a4eecc405c9895cc5cc09bfe95af08a6bff79937, for GNU/Linux 3.2.0, not stripped
