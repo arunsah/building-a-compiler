@@ -1,0 +1,9 @@
+hello.o:
+Relocation information (__TEXT,__text) 3 entries
+address  pcrel length extern type    scattered symbolnum/value
+00000020 True  long   True   BR26    False     _puts
+0000001c False long   True   PAGOF12 False     l_.str
+00000018 True  long   True   PAGE21  False     l_.str
+Relocation information (__LD,__compact_unwind) 1 entries
+address  pcrel length extern type    scattered symbolnum/value
+00000000 False ?( 3)  False  UNSIGND False     1 (__TEXT,__text)

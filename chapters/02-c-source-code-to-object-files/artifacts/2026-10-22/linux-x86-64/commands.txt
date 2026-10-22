@@ -1,0 +1,4 @@
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -E hello.c -o hello.i
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -S hello.c -o hello-O0.s
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O2 -S hello.c -o hello-O2.s
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -c hello.c -o hello.o

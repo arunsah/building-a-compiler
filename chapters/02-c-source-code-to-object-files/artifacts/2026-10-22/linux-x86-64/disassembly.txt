@@ -1,0 +1,17 @@
+
+hello.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <main>:
+   0:	55                   	push   %rbp
+   1:	48 89 e5             	mov    %rsp,%rbp
+   4:	48 8d 05 00 00 00 00 	lea    0x0(%rip),%rax        # b <main+0xb>
+			7: R_X86_64_PC32	.rodata-0x4
+   b:	48 89 c7             	mov    %rax,%rdi
+   e:	e8 00 00 00 00       	call   13 <main+0x13>
+			f: R_X86_64_PLT32	puts-0x4
+  13:	b8 00 00 00 00       	mov    $0x0,%eax
+  18:	5d                   	pop    %rbp
+  19:	c3                   	ret
