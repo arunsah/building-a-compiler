@@ -1,0 +1,84 @@
+hello.o:
+Load command 0
+      cmd LC_SEGMENT_64
+  cmdsize 312
+  segname 
+   vmaddr 0x0000000000000000
+   vmsize 0x0000000000000068
+  fileoff 472
+ filesize 104
+  maxprot 0x00000007
+ initprot 0x00000007
+   nsects 3
+    flags 0x0
+Section
+  sectname __text
+   segname __TEXT
+      addr 0x0000000000000000
+      size 0x0000000000000034
+    offset 472
+     align 2^2 (4)
+    reloff 576
+    nreloc 3
+     flags 0x80000400
+ reserved1 0
+ reserved2 0
+Section
+  sectname __cstring
+   segname __TEXT
+      addr 0x0000000000000034
+      size 0x000000000000000e
+    offset 524
+     align 2^0 (1)
+    reloff 0
+    nreloc 0
+     flags 0x00000002
+ reserved1 0
+ reserved2 0
+Section
+  sectname __compact_unwind
+   segname __LD
+      addr 0x0000000000000048
+      size 0x0000000000000020
+    offset 544
+     align 2^3 (8)
+    reloff 600
+    nreloc 1
+     flags 0x02000000
+ reserved1 0
+ reserved2 0
+Load command 1
+      cmd LC_BUILD_VERSION
+  cmdsize 24
+ platform 1
+    minos 26.0
+      sdk 26.5
+   ntools 0
+Load command 2
+     cmd LC_SYMTAB
+ cmdsize 24
+  symoff 608
+   nsyms 6
+  stroff 704
+ strsize 40
+Load command 3
+            cmd LC_DYSYMTAB
+        cmdsize 80
+      ilocalsym 0
+      nlocalsym 4
+     iextdefsym 4
+     nextdefsym 1
+      iundefsym 5
+      nundefsym 1
+         tocoff 0
+           ntoc 0
+      modtaboff 0
+        nmodtab 0
+   extrefsymoff 0
+    nextrefsyms 0
+ indirectsymoff 0
+  nindirectsyms 0
+      extreloff 0
+        nextrel 0
+      locreloff 0
+        nlocrel 0
