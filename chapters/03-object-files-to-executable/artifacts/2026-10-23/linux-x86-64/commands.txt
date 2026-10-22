@@ -1,0 +1,25 @@
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -c calculator/main.c -o main.o
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -c calculator/add.c -o add.o
+cc main.o -o calculator-missing-add  # expected to fail
+cc -### main.o add.o -o calculator
+cc main.o add.o -Wl,-Map,link-map.txt -o calculator
+ar rcs libcalculator.a add.o
+cc main.o libcalculator.a -Wl,-Map,archive-link-map.txt -o calculator-from-archive
+./calculator 20 22 > program-output.txt
+file main.o add.o libcalculator.a calculator > file-types.txt
+wc -c main.o add.o libcalculator.a calculator > file-sizes.txt
+nm main.o add.o > object-symbols.txt
+nm calculator > executable-symbols.txt
+ar t libcalculator.a > archive-contents.txt
+nm libcalculator.a > archive-symbols.txt
+readelf --relocs --wide main.o > main-relocations.txt
+objdump --disassemble --reloc main.o > main-disassembly.txt
+readelf --file-header calculator > executable-header.txt
+readelf --sections --wide calculator > executable-sections.txt
+readelf --segments --wide calculator > executable-segments.txt
+readelf --symbols --wide calculator > executable-symbol-table.txt
+readelf --relocs --wide calculator > executable-relocations.txt
+readelf --dynamic --wide calculator > dynamic-section.txt
+readelf --dyn-syms --wide calculator > dynamic-symbols.txt
+objdump --disassemble calculator > executable-disassembly.txt
+size main.o add.o calculator > section-sizes.txt

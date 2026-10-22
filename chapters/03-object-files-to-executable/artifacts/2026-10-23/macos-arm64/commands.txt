@@ -1,0 +1,21 @@
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -c calculator/main.c -o main.o
+cc -std=c17 -Wall -Wextra -Wpedantic -Werror -O0 -c calculator/add.c -o add.o
+cc main.o -o calculator-missing-add  # expected to fail
+cc -### main.o add.o -o calculator
+cc main.o add.o -Wl,-map,link-map.txt -o calculator
+ar rcs libcalculator.a add.o
+cc main.o libcalculator.a -Wl,-map,archive-link-map.txt -o calculator-from-archive
+./calculator 20 22 > program-output.txt
+file main.o add.o libcalculator.a calculator > file-types.txt
+wc -c main.o add.o libcalculator.a calculator > file-sizes.txt
+nm main.o add.o > object-symbols.txt
+nm calculator > executable-symbols.txt
+ar t libcalculator.a > archive-contents.txt
+nm libcalculator.a > archive-symbols.txt
+otool -rv main.o > main-relocations.txt
+otool -tvV main.o > main-disassembly.txt
+otool -hv calculator > executable-header.txt
+otool -l calculator > executable-load-commands.txt
+otool -tvV calculator > executable-disassembly.txt
+otool -L calculator > dynamic-dependencies.txt
+dyld_info -imports calculator > dynamic-imports.txt

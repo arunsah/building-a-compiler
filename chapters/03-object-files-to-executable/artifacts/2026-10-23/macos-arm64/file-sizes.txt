@@ -1,0 +1,5 @@
+    1768 main.o
+     680 add.o
+     864 libcalculator.a
+   33672 calculator
+   36984 total
