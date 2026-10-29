@@ -2,19 +2,20 @@
 #define STUDY_X86_64_ASSEMBLY_H
 
 #include "study/diagnostic.h"
-#include "study/ir.h"
 #include "study/source.h"
+#include "study/x86_64.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 
 /*
- * Emit GNU assembler source for the first Linux x86-64 System V target.
- * The input IR is borrowed and verified again before any assembly is written.
+ * Render a verified x86-64 target program as GNU assembler source. This is a
+ * temporary textual adapter: the later encoder will consume the same target
+ * representation without parsing this text.
  */
 bool study_x86_64_emit_assembly(
     FILE *stream,
-    const StudyIrProgram *program,
+    const StudyX86Program *program,
     const StudySource *source,
     StudyDiagnostic *diagnostic
 );

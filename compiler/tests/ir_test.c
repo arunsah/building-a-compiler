@@ -10,7 +10,10 @@
 #include "study/source.h"
 #include "study/syntax.h"
 #include "study/token.h"
+#include "study/x86_64.h"
 #include "study/x86_64_assembly.h"
+#include "study/x86_64_lower.h"
+#include "study/x86_64_verify.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -142,19 +145,46 @@ static void emit_assembly_fixture(
     size_t output_capacity
 ) {
     StudyDiagnostic diagnostic;
+    StudyX86Program x86;
     FILE *stream = tmpfile();
 
     assert(stream != NULL);
+    study_x86_64_program_init(&x86);
     study_diagnostic_clear(&diagnostic);
+    assert(study_lower_to_x86_64(
+        &fixture->ir,
+        &fixture->source,
+        &x86,
+        &diagnostic
+    ));
     assert(study_x86_64_emit_assembly(
         stream,
-        &fixture->ir,
+        &x86,
         &fixture->source,
         &diagnostic
     ));
     assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
     read_stream(stream, output, output_capacity);
     assert(fclose(stream) == 0);
+    study_x86_64_program_free(&x86);
+}
+
+static void lower_x86_fixture(
+    IrFixture *fixture,
+    StudyX86Program *x86
+) {
+    StudyDiagnostic diagnostic;
+
+    study_x86_64_program_init(x86);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_lower_to_x86_64(
+        &fixture->ir,
+        &fixture->source,
+        x86,
+        &diagnostic
+    ));
+    assert(study_x86_64_verify(x86, &fixture->source, &diagnostic));
+    assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
 }
 
 static void expect_verify_error(IrFixture *fixture, const char *message) {
@@ -221,6 +251,122 @@ static void test_small_ir_assembly(void) {
     ir_fixture_free(&fixture);
 }
 
+static void test_small_x86_target_shape_and_dump(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyDiagnostic diagnostic;
+    FILE *stream;
+    char dump[16384];
+    const StudyX86Function *function;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    lower_x86_fixture(&fixture, &x86);
+    assert(x86.function_count == 3U);
+    assert(x86.start_function == 0U);
+    assert(x86.print_function == 1U);
+    assert(x86.functions[0].kind == STUDY_X86_FUNCTION_START);
+    assert(x86.functions[1].kind == STUDY_X86_FUNCTION_PRINT_I32);
+    function = &x86.functions[2];
+    assert(function->kind == STUDY_X86_FUNCTION_STUDY);
+    assert(function->ir_function == 0U);
+    assert(function->frame_size == 16U);
+    assert(function->storage_count == 1U);
+    assert(x86.storage[function->first_storage].kind ==
+           STUDY_X86_STORAGE_VALUE);
+    assert(x86.storage[function->first_storage].ir_id == 0U);
+    assert(x86.storage[function->first_storage].displacement == -8);
+
+    stream = tmpfile();
+    assert(stream != NULL);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_x86_64_program_dump(
+        stream,
+        &x86,
+        &fixture.source,
+        &diagnostic
+    ));
+    read_stream(stream, dump, sizeof(dump));
+    assert(fclose(stream) == 0);
+    assert(strstr(dump, "target x86-64-linux-system-v") != NULL);
+    assert(strstr(dump, "function f0 _start") != NULL);
+    assert(strstr(dump, "ir.v0 -> i32 [rbp-8]") != NULL);
+    assert(strstr(dump, "mov.i32 #0x0000002a, eax") != NULL);
+    assert(strstr(dump, "mov.i32 eax, [rbp-8]") != NULL);
+
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_x86_verifier_rejects_cross_function_branch(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyDiagnostic diagnostic;
+    size_t index;
+    bool changed = false;
+
+    lower_text(
+        &fixture,
+        "fn main() -> i32 { if true { return 1; } else { return 2; } }\n"
+    );
+    lower_x86_fixture(&fixture, &x86);
+    for (index = 0U; index < x86.instruction_count; index++) {
+        if (x86.instructions[index].opcode ==
+                STUDY_X86_BRANCH_CONDITION &&
+            x86.instructions[index].function == 2U) {
+            x86.instructions[index].then_block =
+                x86.functions[x86.print_function].entry_block;
+            changed = true;
+            break;
+        }
+    }
+    assert(changed);
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_x86_64_verify(&x86, &fixture.source, &diagnostic));
+    assert(strstr(diagnostic.message, "invalid operands") != NULL);
+
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_x86_verifier_rejects_storage_outside_frame(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyDiagnostic diagnostic;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    lower_x86_fixture(&fixture, &x86);
+    x86.functions[2].frame_size = 0U;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_x86_64_verify(&x86, &fixture.source, &diagnostic));
+    assert(strstr(diagnostic.message, "outside its owning frame") != NULL);
+
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_x86_lowering_rejects_nonempty_output(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyDiagnostic diagnostic;
+    size_t instruction_count;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    lower_x86_fixture(&fixture, &x86);
+    instruction_count = x86.instruction_count;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_lower_to_x86_64(
+        &fixture.ir,
+        &fixture.source,
+        &x86,
+        &diagnostic
+    ));
+    assert(x86.instruction_count == instruction_count);
+    assert(strstr(diagnostic.message, "initialised empty output") != NULL);
+
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
 static void test_loop_call_print_and_result(void) {
     static const char text[] =
         "fn sum_to(limit: i32) -> i32 {\n"
@@ -276,12 +422,12 @@ static void test_loop_call_and_print_assembly(void) {
 
     lower_text(&fixture, text);
     emit_assembly_fixture(&fixture, assembly, sizeof(assembly));
-    assert(strstr(assembly, "_start:\n  call study_fn_1\n") != NULL);
+    assert(strstr(assembly, "  call study_fn_1\n") != NULL);
     assert(strstr(assembly, "  call study_fn_0\n") != NULL);
     assert(strstr(assembly, "  setle %al\n") != NULL);
-    assert(strstr(assembly, "  jne .Lstudy_f0_b2\n") != NULL);
+    assert(strstr(assembly, "  jne .Lstudy_x86_b") != NULL);
     assert(strstr(assembly, "  call study_rt_print_i32\n") != NULL);
-    assert(strstr(assembly, ".Lstudy_print_write_again:\n") != NULL);
+    assert(strstr(assembly, "  syscall\n  cmpq $-4, %rax\n") != NULL);
     ir_fixture_free(&fixture);
 }
 
@@ -500,6 +646,10 @@ static void test_nonempty_output_is_rejected(void) {
 int main(void) {
     test_small_ir_shape();
     test_small_ir_assembly();
+    test_small_x86_target_shape_and_dump();
+    test_x86_verifier_rejects_cross_function_branch();
+    test_x86_verifier_rejects_storage_outside_frame();
+    test_x86_lowering_rejects_nonempty_output();
     test_loop_call_print_and_result();
     test_loop_call_and_print_assembly();
     test_wraparound_and_signed_comparison();

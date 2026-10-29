@@ -39,6 +39,8 @@ grep -Fq 'studycc dump checked INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump checked'
 grep -Fq 'studycc dump ir INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump ir'
+grep -Fq 'studycc dump x86-64 INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump x86-64'
 grep -Fq 'studycc emit asm INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit asm'
 grep -Fq 'studycc build INPUT.study -o OUTPUT' "$temporary_directory/stdout" || \
@@ -121,6 +123,17 @@ grep -Fq '%v0: i32 = const.i32 42' "$temporary_directory/stdout" || \
     fail 'IR dump did not include the integer value'
 grep -Fq 'return %v0' "$temporary_directory/stdout" || \
     fail 'IR dump did not include the return terminator'
+
+expect_status 0 "$compiler" dump x86-64 examples/return-42.study
+grep -Fq 'target x86-64-linux-system-v {' \
+    "$temporary_directory/stdout" || \
+    fail 'x86-64 dump did not name the target'
+grep -Fq 'function f0 _start [frame=0' "$temporary_directory/stdout" || \
+    fail 'x86-64 dump did not include the process entry function'
+grep -Fq 'ir.v0 -> i32 [rbp-8]' "$temporary_directory/stdout" || \
+    fail 'x86-64 dump did not show the value stack location'
+grep -Fq 'mov.i32 #0x0000002a, eax' "$temporary_directory/stdout" || \
+    fail 'x86-64 dump did not show selected instructions'
 
 expect_status 0 "$compiler" emit asm examples/return-42.study
 grep -Fq '.globl _start' "$temporary_directory/stdout" || \

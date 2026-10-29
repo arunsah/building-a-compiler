@@ -2,8 +2,8 @@
 #define STUDY_BUILD_H
 
 #include "study/diagnostic.h"
-#include "study/ir.h"
 #include "study/source.h"
+#include "study/x86_64.h"
 
 #include <stdbool.h>
 
@@ -14,7 +14,7 @@
  * build leaves the requested output unchanged.
  */
 bool study_build_with_system_tools(
-    const StudyIrProgram *program,
+    const StudyX86Program *program,
     const StudySource *source,
     const char *output_path,
     StudyDiagnostic *diagnostic

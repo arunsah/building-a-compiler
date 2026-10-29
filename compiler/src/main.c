@@ -10,7 +10,9 @@
 #include "study/source.h"
 #include "study/syntax.h"
 #include "study/token.h"
+#include "study/x86_64.h"
 #include "study/x86_64_assembly.h"
+#include "study/x86_64_lower.h"
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -23,7 +25,8 @@ enum {
 };
 
 typedef enum StudyIrAction {
-    STUDY_IR_ACTION_DUMP,
+    STUDY_IR_ACTION_DUMP_IR,
+    STUDY_IR_ACTION_DUMP_X86_64,
     STUDY_IR_ACTION_EMIT_ASSEMBLY,
     STUDY_IR_ACTION_INTERPRET,
     STUDY_IR_ACTION_BUILD
@@ -38,6 +41,7 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump ast INPUT.study\n"
         "  studycc dump checked INPUT.study\n"
         "  studycc dump ir INPUT.study\n"
+        "  studycc dump x86-64 INPUT.study\n"
         "  studycc emit asm INPUT.study\n"
         "  studycc build INPUT.study -o OUTPUT\n"
         "  studycc check INPUT.study\n"
@@ -228,6 +232,7 @@ static int study_ir_path(
     StudySyntaxTree tree;
     StudyCheckedProgram checked;
     StudyIrProgram ir;
+    StudyX86Program x86;
     StudyDiagnostic diagnostic;
     uint32_t main_result = 0U;
     int status = STUDY_EXIT_SUCCESS;
@@ -237,6 +242,7 @@ static int study_ir_path(
     study_syntax_tree_init(&tree);
     study_checked_program_init(&checked);
     study_ir_program_init(&ir);
+    study_x86_64_program_init(&x86);
     study_diagnostic_clear(&diagnostic);
 
     if (!study_source_read(&source, path, &diagnostic) ||
@@ -259,7 +265,18 @@ static int study_ir_path(
         )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
-    } else if (action == STUDY_IR_ACTION_DUMP &&
+    } else if ((action == STUDY_IR_ACTION_DUMP_X86_64 ||
+                action == STUDY_IR_ACTION_EMIT_ASSEMBLY ||
+                action == STUDY_IR_ACTION_BUILD) &&
+               !study_lower_to_x86_64(
+                   &ir,
+                   &source,
+                   &x86,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_DUMP_IR &&
                !study_ir_program_dump(
                    stdout,
                    &ir,
@@ -274,10 +291,19 @@ static int study_ir_path(
         );
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_DUMP_X86_64 &&
+               !study_x86_64_program_dump(
+                   stdout,
+                   &x86,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
     } else if (action == STUDY_IR_ACTION_EMIT_ASSEMBLY &&
                !study_x86_64_emit_assembly(
                    stdout,
-                   &ir,
+                   &x86,
                    &source,
                    &diagnostic
                )) {
@@ -295,7 +321,7 @@ static int study_ir_path(
         status = STUDY_EXIT_INPUT_ERROR;
     } else if (action == STUDY_IR_ACTION_BUILD &&
                !study_build_with_system_tools(
-                   &ir,
+                   &x86,
                    &source,
                    build_output,
                    &diagnostic
@@ -305,6 +331,7 @@ static int study_ir_path(
     }
 
     (void)main_result;
+    study_x86_64_program_free(&x86);
     study_ir_program_free(&ir);
     study_checked_program_free(&checked);
     study_syntax_tree_free(&tree);
@@ -341,7 +368,16 @@ int main(int argc, char **argv) {
 
     if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
         strcmp(argv[2], "ir") == 0) {
-        return study_ir_path(argv[3], STUDY_IR_ACTION_DUMP, NULL);
+        return study_ir_path(argv[3], STUDY_IR_ACTION_DUMP_IR, NULL);
+    }
+
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "x86-64") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_DUMP_X86_64,
+            NULL
+        );
     }
 
     if (argc == 4 && strcmp(argv[1], "emit") == 0 &&

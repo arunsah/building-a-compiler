@@ -44,7 +44,7 @@ static bool study_build_path(
 }
 
 bool study_build_with_system_tools(
-    const StudyIrProgram *program,
+    const StudyX86Program *program,
     const StudySource *source,
     const char *output_path,
     StudyDiagnostic *diagnostic
