@@ -107,8 +107,8 @@ The current parser records are under
 The current semantic-checker records are under
 [`evidence/06-checker`](evidence/06-checker).
 
-The typed-IR checkpoint will retain its records under `evidence/07-typed-ir`
-after review.
+The current typed-IR and reference-interpreter records are under
+[`evidence/07-typed-ir`](evidence/07-typed-ir).
 
 ## Source ownership contract
 

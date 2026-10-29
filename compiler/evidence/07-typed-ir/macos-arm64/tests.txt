@@ -1,0 +1,3 @@
+strict-warning-tests=passed
+typed-ir-verifier-tests=passed
+reference-interpreter-tests=passed

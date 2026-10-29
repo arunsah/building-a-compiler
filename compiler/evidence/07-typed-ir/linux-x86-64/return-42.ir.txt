@@ -1,0 +1,6 @@
+function @main() -> i32 {
+  slots:
+  b0:  ; entry
+    %v0: i32 = const.i32 42  ; 2:12..2:14
+    return %v0  ; 2:5..2:15
+}
