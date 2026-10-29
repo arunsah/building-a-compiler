@@ -6,22 +6,42 @@ investigation of the existing C toolchain now belongs to the independent
 [Understanding C](https://arunsah.com/c) series. The repository keeps the
 source code, experiments, and recorded outputs used by those articles.
 
-Each chapter has its own directory. The directory contains the programs used
-in the article, a script which verifies them, and any generated files which the
-article discusses. This keeps the complete evidence available without placing
-large compiler outputs inside the article.
+The `chapters/` directories contain the programs, verification scripts, and
+recorded files used by the earlier toolchain articles. This keeps their
+complete evidence available without placing large compiler output inside the
+article.
+
+The new [`compiler/`](compiler) directory contains the one evolving compiler
+which we will build through the rest of the series. We mark reviewed chapter
+checkpoints in Git history instead of copying the complete compiler into a new
+directory for every chapter.
 
 ## Current articles
 
 - Understanding C, Article 2: [From C source code to object files](chapters/02-c-source-code-to-object-files)
 - Understanding C, Article 3: [From object files to an executable](chapters/03-object-files-to-executable)
 
+## Current compiler checkpoint
+
+The first implementation checkpoint establishes the `studycc` driver,
+diagnostic record, and owned source-byte boundary. It does not tokenize or
+compile the source yet.
+
+```sh
+make -C compiler test
+make -C compiler sanitize
+./compiler/build/studycc dump source compiler/examples/return-42.study
+```
+
+See the [compiler README](compiler/README.md) for the ownership contract,
+directory layout, exit statuses, and current limits.
+
 ## Working on an article
 
-Work for an article is prepared on its own branch. The source, article examples,
-and recorded outputs are reviewed together. When the article is ready, its
-branch can be squash-merged so that `main` has one clear checkpoint for that
-article.
+Work for an article is prepared on its own branch. The implementation, article
+examples, and recorded output are reviewed together. When the article is
+ready, its branch can be squash-merged so that `main` has one clear checkpoint
+for that article.
 
 ## Licence
 

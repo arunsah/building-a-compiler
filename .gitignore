@@ -36,6 +36,9 @@
 *.x86_64
 *.hex
 
+# Local compiler builds
+compiler/build/
+
 # Debug files
 *.dSYM/
 *.su
