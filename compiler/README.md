@@ -45,6 +45,17 @@ tests cover command usage, missing files, empty input, paths containing spaces,
 CRLF and bare-CR line endings, embedded NUL bytes, buffer growth, and the C
 source-ownership API.
 
+To retain a small environment and verification record in a new directory:
+
+```sh
+./compiler/record-driver-evidence.sh NEW_OUTPUT_DIRECTORY
+```
+
+The recorder uses a temporary build directory, runs the strict and sanitizer
+tests, saves one sample observation, and writes checksums. Review
+`environment.txt` before committing it; environment records must not contain a
+private hostname, account identifier, credential, or token.
+
 ## Source ownership contract
 
 `study_source_read()` reads bytes through a stream instead of assuming a

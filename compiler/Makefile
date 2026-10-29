@@ -24,8 +24,8 @@ $(BUILD_DIR)/source-test: tests/source_test.c $(LIB_SOURCES) $(HEADERS) | $(BUIL
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) tests/source_test.c $(LIB_SOURCES) -o $@
 
 test: $(BUILD_DIR)/studycc $(BUILD_DIR)/source-test
-	./$(BUILD_DIR)/source-test
-	sh tests/driver_test.sh ./$(BUILD_DIR)/studycc
+	"$(BUILD_DIR)/source-test"
+	sh tests/driver_test.sh "$(BUILD_DIR)/studycc"
 
 sanitize:
 	$(MAKE) BUILD_DIR=build/sanitize \
