@@ -1,0 +1,4 @@
+source: examples/return-42.study
+bytes: 36
+lines: 4
+final line ending: yes

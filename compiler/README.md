@@ -56,6 +56,10 @@ tests, saves one sample observation, and writes checksums. Review
 `environment.txt` before committing it; environment records must not contain a
 private hostname, account identifier, credential, or token.
 
+The reviewed records for this checkpoint are under
+[`evidence/03-driver-source`](evidence/03-driver-source). They show the same
+source and command checks on macOS Arm64 and Debian Linux x86-64.
+
 ## Source ownership contract
 
 `study_source_read()` reads bytes through a stream instead of assuming a
