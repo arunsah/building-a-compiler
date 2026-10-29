@@ -130,7 +130,7 @@ grep -Fq 'target x86-64-linux-system-v {' \
     fail 'x86-64 dump did not name the target'
 grep -Fq 'function f0 _start [frame=0' "$temporary_directory/stdout" || \
     fail 'x86-64 dump did not include the process entry function'
-grep -Fq 'ir.v0 -> i32 [rbp-8]' "$temporary_directory/stdout" || \
+grep -Fq 'ir.v0 -> width=32 [rbp-8]' "$temporary_directory/stdout" || \
     fail 'x86-64 dump did not show the value stack location'
 grep -Fq 'mov.i32 #0x0000002a, eax' "$temporary_directory/stdout" || \
     fail 'x86-64 dump did not show selected instructions'

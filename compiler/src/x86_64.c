@@ -348,7 +348,7 @@ static bool study_x86_64_dump_function(
 
             if (fprintf(
                     stream,
-                    "      ir.%c%zu -> i32 [rbp%+" PRId32 "]\n",
+                    "      ir.%c%zu -> width=32 [rbp%+" PRId32 "]\n",
                     prefix,
                     storage->ir_id,
                     storage->displacement

@@ -289,7 +289,7 @@ static void test_small_x86_target_shape_and_dump(void) {
     assert(fclose(stream) == 0);
     assert(strstr(dump, "target x86-64-linux-system-v") != NULL);
     assert(strstr(dump, "function f0 _start") != NULL);
-    assert(strstr(dump, "ir.v0 -> i32 [rbp-8]") != NULL);
+    assert(strstr(dump, "ir.v0 -> width=32 [rbp-8]") != NULL);
     assert(strstr(dump, "mov.i32 #0x0000002a, eax") != NULL);
     assert(strstr(dump, "mov.i32 eax, [rbp-8]") != NULL);
 
