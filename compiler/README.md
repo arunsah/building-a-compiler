@@ -9,14 +9,14 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: driver and owned source bytes
+## Current checkpoint: tokens and source ranges
 
-The current command reads a source file and prints the metadata which the
-driver observed:
+The driver can show both the source metadata and the token stream:
 
 ```sh
 make -C compiler
 ./compiler/build/studycc dump source compiler/examples/return-42.study
+./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ```
 
 Expected shape:
@@ -28,10 +28,15 @@ lines: 4
 final line ending: yes
 ```
 
-The exact byte count depends on the checked-in fixture and is verified by the
-test suite. No tokenisation, parsing, checking, or executable generation is
-implemented yet. The `dump source` command does not claim that the file is a
-valid Study program.
+The token dump gives each token an exclusive byte range and a one-based line
+and byte-column range. Integer tokens also carry their checked numeric value.
+The lexer recognises the keywords and punctuation in the first Study grammar,
+ASCII identifiers, decimal integers, spaces, tabs, common line endings, and
+`//` line comments. It rejects unsupported bytes and decimal integers above
+`2147483647` at their source location.
+
+No parsing, checking, or executable generation is implemented yet. A valid
+token stream does not claim that the tokens form a valid Study program.
 
 ## Build and verify
 
@@ -41,14 +46,15 @@ make -C compiler sanitize
 ```
 
 The default build enables strict warnings and treats warnings as errors. The
-tests cover command usage, missing files, empty input, paths containing spaces,
-CRLF and bare-CR line endings, embedded NUL bytes, buffer growth, and the C
-source-ownership API.
+tests cover command usage, source ownership, empty input, paths containing
+spaces, CRLF and bare-CR line endings, comments, every current keyword and
+operator, longest operator matches, integer bounds, unsupported bytes, token
+array ownership, and source ranges.
 
 To retain a small environment and verification record in a new directory:
 
 ```sh
-./compiler/record-driver-evidence.sh NEW_OUTPUT_DIRECTORY
+./compiler/record-lexer-evidence.sh NEW_OUTPUT_DIRECTORY
 ```
 
 The recorder uses a temporary build directory, runs the strict and sanitizer
@@ -56,9 +62,10 @@ tests, saves one sample observation, and writes checksums. Review
 `environment.txt` before committing it; environment records must not contain a
 private hostname, account identifier, credential, or token.
 
-The reviewed records for this checkpoint are under
-[`evidence/03-driver-source`](evidence/03-driver-source). They show the same
-source and command checks on macOS Arm64 and Debian Linux x86-64.
+The earlier driver records remain under
+[`evidence/03-driver-source`](evidence/03-driver-source). The lexer checkpoint
+will retain its own macOS Arm64 and Debian Linux x86-64 records under
+`evidence/04-lexer` after review.
 
 ## Source ownership contract
 
@@ -84,6 +91,23 @@ Diagnostics own their message text inside a fixed-size record and borrow their
 path. A file-open diagnostic borrows the caller's path; later source
 diagnostics will borrow `StudySource.path`. The driver prints a diagnostic
 before releasing the corresponding owner.
+
+## Token ownership contract
+
+`study_lex()` borrows an immutable `StudySource` and writes into an initialized
+empty `StudyTokenList`. On success, the list owns its dynamic token array. Each
+token records a range into the source rather than copying its spelling, so the
+source must outlive every token consumer.
+
+On failure, the output list remains empty and the diagnostic borrows the
+source path. The lexer may allocate a temporary list while scanning, but it
+does not publish a partial token stream. `study_token_list_free()` releases an
+owned list and restores it to the empty state.
+
+Token positions use zero-based byte offsets and one-based lines and columns.
+Columns count source bytes rather than terminal display cells. CRLF consumes
+two bytes but advances the line only once. Every range has an exclusive end,
+and the EOF token has an empty range at the final source position.
 
 ## Exit status
 

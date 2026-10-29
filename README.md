@@ -23,14 +23,15 @@ directory for every chapter.
 
 ## Current compiler checkpoint
 
-The first implementation checkpoint establishes the `studycc` driver,
-diagnostic record, and owned source-byte boundary. It does not tokenize or
-compile the source yet.
+The compiler now establishes the `studycc` driver and owned source-byte
+boundary, then turns the source into tokens with exact byte, line, and column
+ranges. It does not parse or compile the token stream yet.
 
 ```sh
 make -C compiler test
 make -C compiler sanitize
 ./compiler/build/studycc dump source compiler/examples/return-42.study
+./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ```
 
 See the [compiler README](compiler/README.md) for the ownership contract,

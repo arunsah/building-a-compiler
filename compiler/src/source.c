@@ -235,7 +235,7 @@ bool study_source_read(
         amount = fread(result.bytes + result.length, 1U, available, input);
         result.length += amount;
 
-        if (amount != 0U) {
+        if (amount == available) {
             continue;
         }
 
@@ -252,7 +252,19 @@ bool study_source_read(
             return false;
         }
 
-        break;
+        if (feof(input) != 0) {
+            break;
+        }
+
+        study_source_free(&result);
+        (void)fclose(input);
+        study_diagnostic_set(
+            diagnostic,
+            STUDY_DIAGNOSTIC_IO,
+            path,
+            "source read made no progress"
+        );
+        return false;
     }
 
     if (fclose(input) != 0) {

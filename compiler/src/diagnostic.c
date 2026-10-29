@@ -67,6 +67,22 @@ void study_diagnostic_set_errno(
     );
 }
 
+void study_diagnostic_set_location(
+    StudyDiagnostic *diagnostic,
+    size_t byte_offset,
+    size_t line,
+    size_t column
+) {
+    if (diagnostic == NULL) {
+        return;
+    }
+
+    diagnostic->has_location = true;
+    diagnostic->byte_offset = byte_offset;
+    diagnostic->line = line;
+    diagnostic->column = column;
+}
+
 void study_diagnostic_print(FILE *stream, const StudyDiagnostic *diagnostic) {
     if (stream == NULL || diagnostic == NULL ||
         diagnostic->kind == STUDY_DIAGNOSTIC_NONE) {

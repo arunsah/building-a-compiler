@@ -53,6 +53,13 @@ void study_diagnostic_set_errno(
     int error_number
 );
 
+void study_diagnostic_set_location(
+    StudyDiagnostic *diagnostic,
+    size_t byte_offset,
+    size_t line,
+    size_t column
+);
+
 void study_diagnostic_print(FILE *stream, const StudyDiagnostic *diagnostic);
 
 #endif
