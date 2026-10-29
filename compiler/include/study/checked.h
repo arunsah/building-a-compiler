@@ -9,8 +9,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-enum { STUDY_MAX_FUNCTION_PARAMETERS = 6 };
-
 typedef size_t StudyDeclarationId;
 
 #define STUDY_DECLARATION_NONE SIZE_MAX

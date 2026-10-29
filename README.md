@@ -27,7 +27,9 @@ The compiler now establishes the `studycc` driver and owned source-byte
 boundary, turns the source into tokens with exact ranges, and parses the
 complete first grammar into a syntax tree. It now also resolves function and
 local names, checks expression types and calls, and verifies return paths. It
-does not lower the checked program to IR or compile it yet.
+now lowers the checked program into typed basic blocks, verifies that IR, and
+executes it with a small reference interpreter. It does not generate native
+code yet.
 
 ```sh
 make -C compiler test
@@ -36,7 +38,9 @@ make -C compiler sanitize
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
 ./compiler/build/studycc dump checked compiler/examples/return-42.study
+./compiler/build/studycc dump ir compiler/examples/return-42.study
 ./compiler/build/studycc check compiler/examples/return-42.study
+./compiler/build/studycc interpret compiler/examples/sum-to.study
 ```
 
 See the [compiler README](compiler/README.md) for the ownership contract,

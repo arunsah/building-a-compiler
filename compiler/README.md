@@ -9,7 +9,7 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: names, scopes, and types
+## Current checkpoint: typed IR and reference interpretation
 
 The driver can show both the source metadata and the token stream:
 
@@ -19,7 +19,9 @@ make -C compiler
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
 ./compiler/build/studycc dump checked compiler/examples/return-42.study
+./compiler/build/studycc dump ir compiler/examples/return-42.study
 ./compiler/build/studycc check compiler/examples/return-42.study
+./compiler/build/studycc interpret compiler/examples/sum-to.study
 ```
 
 Expected shape:
@@ -49,7 +51,19 @@ locals and parameters through lexical block scopes, annotates expressions with
 and return values, and conservatively checks that every function path returns.
 `dump checked` makes those types and declaration links visible beside the AST.
 
-Typed IR, interpretation, and executable generation are not implemented yet.
+`dump ir` lowers the checked program into typed values, mutable slots, and
+basic blocks with explicit branch, jump, and return terminators. Every operand
+value is defined earlier in the same block; values which must survive between
+blocks are stored in typed slots. The independent verifier checks owners,
+types, instruction chains, terminators, call signatures, control-flow targets,
+reachability, and the `main` boundary without consulting the syntax tree.
+
+`interpret` verifies the IR and executes `main`. It writes only the Study
+program's `print` output. The command still returns the compiler's success or
+failure status; the interpreter API returns the exact `i32` result separately.
+Arithmetic uses unsigned C operations to implement Study's 32-bit wraparound
+rules without relying on signed C overflow. Native code generation is not
+implemented yet.
 
 ## Build and verify
 
@@ -66,16 +80,19 @@ array ownership, source ranges, every current statement and expression shape,
 operator precedence and associativity, malformed grammar, and bounded syntax
 nesting. Semantic tests additionally cover forward calls, block shadowing,
 same-scope duplicates, unknown names, every current type rule, function
-signatures and argument lists, and conservative return-path analysis.
+signatures and argument lists, and conservative return-path analysis. IR and
+interpreter tests cover lowering, typed values and slots, branches, loops,
+calls, recursion, signed comparisons, wraparound arithmetic, program output,
+the `main` result, and deliberately corrupted IR rejected by the verifier.
 
 To retain a small environment and verification record in a new directory:
 
 ```sh
-./compiler/record-checker-evidence.sh NEW_OUTPUT_DIRECTORY
+./compiler/record-ir-evidence.sh NEW_OUTPUT_DIRECTORY
 ```
 
 The recorder uses a temporary build directory, runs the strict and sanitizer
-tests, saves one sample observation, and writes checksums. Review
+tests, saves one IR dump and one interpreted result, and writes checksums. Review
 `environment.txt` before committing it; environment records must not contain a
 private hostname, account identifier, credential, or token.
 
@@ -89,6 +106,9 @@ The current parser records are under
 
 The current semantic-checker records are under
 [`evidence/06-checker`](evidence/06-checker).
+
+The typed-IR checkpoint will retain its records under `evidence/07-typed-ir`
+after review.
 
 ## Source ownership contract
 
@@ -167,6 +187,32 @@ source.
 The checker builds temporary declaration and scope tables. It publishes the
 checked program only after every function body succeeds. A semantic error
 frees those arrays and leaves the caller's output empty.
+
+## Typed-IR ownership and verification contract
+
+`study_lower_to_ir()` borrows the source, token list, syntax tree, and checked
+program. On success, `StudyIrProgram` owns five growable arrays: functions,
+basic blocks, instructions, slots, and values. Function and slot names remain
+token indices so the source and token list must outlive an IR dump. Execution
+uses resolved numeric IDs and does not need name spelling.
+
+Instructions within a block form one linked sequence. Each block ends in
+exactly one branch, jump, or return. Result values are immutable temporaries
+and may be used only after their definition in the same block. Mutable source
+variables and parameters use typed slots, which make values available across
+control-flow edges without adding SSA phi nodes to this first IR.
+
+The lowerer builds a temporary program, runs `study_ir_verify()`, and publishes
+the result only after verification succeeds. The verifier does not consult the
+syntax tree or checked annotations. This makes it a boundary check for every
+later stage which consumes or transforms IR rather than only an assertion that
+the lowerer probably emitted the right shape.
+
+The reference interpreter verifies its input again. It limits nested calls to
+256 and one interpretation to 1,000,000 executed IR instructions so recursive
+or non-terminating input cannot consume the host without a stated boundary.
+Those limits belong to the reference tool, not to the meaning of a future
+native executable.
 
 ## Exit status
 

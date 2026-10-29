@@ -1,7 +1,10 @@
 #include "study/checked.h"
 #include "study/checker.h"
 #include "study/diagnostic.h"
+#include "study/interpreter.h"
+#include "study/ir.h"
 #include "study/lexer.h"
+#include "study/lower.h"
 #include "study/parser.h"
 #include "study/source.h"
 #include "study/syntax.h"
@@ -25,7 +28,9 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump tokens INPUT.study\n"
         "  studycc dump ast INPUT.study\n"
         "  studycc dump checked INPUT.study\n"
+        "  studycc dump ir INPUT.study\n"
         "  studycc check INPUT.study\n"
+        "  studycc interpret INPUT.study\n"
         "  studycc --help\n"
     );
 }
@@ -202,6 +207,79 @@ static int study_check_path(const char *path, bool dump_checked) {
     return status;
 }
 
+static int study_ir_path(const char *path, bool dump_ir, bool interpret) {
+    StudySource source;
+    StudyTokenList tokens;
+    StudySyntaxTree tree;
+    StudyCheckedProgram checked;
+    StudyIrProgram ir;
+    StudyDiagnostic diagnostic;
+    uint32_t main_result = 0U;
+    int status = STUDY_EXIT_SUCCESS;
+
+    study_source_init(&source);
+    study_token_list_init(&tokens);
+    study_syntax_tree_init(&tree);
+    study_checked_program_init(&checked);
+    study_ir_program_init(&ir);
+    study_diagnostic_clear(&diagnostic);
+
+    if (!study_source_read(&source, path, &diagnostic) ||
+        !study_lex(&source, &tokens, &diagnostic) ||
+        !study_parse(&source, &tokens, &tree, &diagnostic) ||
+        !study_check_program(
+            &source,
+            &tokens,
+            &tree,
+            &checked,
+            &diagnostic
+        ) ||
+        !study_lower_to_ir(
+            &source,
+            &tokens,
+            &tree,
+            &checked,
+            &ir,
+            &diagnostic
+        )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (dump_ir &&
+               !study_ir_program_dump(
+                   stdout,
+                   &ir,
+                   &source,
+                   &tokens
+               )) {
+        study_diagnostic_set(
+            &diagnostic,
+            STUDY_DIAGNOSTIC_INTERNAL,
+            source.path,
+            "could not write typed IR dump"
+        );
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (interpret &&
+               !study_ir_interpret(
+                   &ir,
+                   &source,
+                   stdout,
+                   &main_result,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    }
+
+    (void)main_result;
+    study_ir_program_free(&ir);
+    study_checked_program_free(&checked);
+    study_syntax_tree_free(&tree);
+    study_token_list_free(&tokens);
+    study_source_free(&source);
+    return status;
+}
+
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         study_print_usage(stdout);
@@ -228,8 +306,17 @@ int main(int argc, char **argv) {
         return study_check_path(argv[3], true);
     }
 
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "ir") == 0) {
+        return study_ir_path(argv[3], true, false);
+    }
+
     if (argc == 3 && strcmp(argv[1], "check") == 0) {
         return study_check_path(argv[2], false);
+    }
+
+    if (argc == 3 && strcmp(argv[1], "interpret") == 0) {
+        return study_ir_path(argv[2], false, true);
     }
 
     study_print_usage(stderr);

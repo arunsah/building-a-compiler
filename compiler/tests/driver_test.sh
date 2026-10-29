@@ -37,8 +37,12 @@ grep -Fq 'studycc dump ast INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump ast'
 grep -Fq 'studycc dump checked INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump checked'
+grep -Fq 'studycc dump ir INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump ir'
 grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe check'
+grep -Fq 'studycc interpret INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe interpret'
 
 expect_status 2 "$compiler"
 grep -Fq 'Usage:' "$temporary_directory/stderr" || \
@@ -105,6 +109,24 @@ expect_status 1 "$compiler" check examples/invalid/type-mismatch.study
 grep -Fq 'examples/invalid/type-mismatch.study:2:12: error: return value requires i32, found bool' \
     "$temporary_directory/stderr" || \
     fail 'checker did not locate the return type mismatch'
+
+expect_status 0 "$compiler" dump ir examples/return-42.study
+grep -Fq 'function @main() -> i32 {' "$temporary_directory/stdout" || \
+    fail 'IR dump did not include main'
+grep -Fq '%v0: i32 = const.i32 42' "$temporary_directory/stdout" || \
+    fail 'IR dump did not include the integer value'
+grep -Fq 'return %v0' "$temporary_directory/stdout" || \
+    fail 'IR dump did not include the return terminator'
+
+expect_status 0 "$compiler" interpret examples/return-42.study
+test ! -s "$temporary_directory/stdout" || \
+    fail 'return-only interpretation wrote unexpected program output'
+
+expect_status 0 "$compiler" interpret examples/sum-to.study
+test "$(cat "$temporary_directory/stdout")" = '55' || \
+    fail 'sum-to interpretation did not print 55'
+test ! -s "$temporary_directory/stderr" || \
+    fail 'successful interpretation wrote unexpected standard error'
 
 missing_path="$temporary_directory/missing.study"
 expect_status 1 "$compiler" dump source "$missing_path"
