@@ -136,6 +136,10 @@ static bool study_x86_64_instruction_shape_is_valid(
         case STUDY_X86_COMPARE:
             return study_x86_64_binary_operands_are_valid(instruction, true);
         case STUDY_X86_MULTIPLY:
+            return study_x86_64_operand_is_data(&instruction->first) &&
+                   instruction->second.kind == STUDY_X86_OPERAND_REGISTER &&
+                   instruction->first.width == instruction->second.width &&
+                   instruction->second.width != STUDY_X86_WIDTH_8;
         case STUDY_X86_TEST:
             return study_x86_64_binary_operands_are_valid(instruction, false);
         case STUDY_X86_NEGATE:

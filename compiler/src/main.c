@@ -12,6 +12,7 @@
 #include "study/token.h"
 #include "study/x86_64.h"
 #include "study/x86_64_assembly.h"
+#include "study/x86_64_encode.h"
 #include "study/x86_64_lower.h"
 
 #include <inttypes.h>
@@ -27,9 +28,12 @@ enum {
 typedef enum StudyIrAction {
     STUDY_IR_ACTION_DUMP_IR,
     STUDY_IR_ACTION_DUMP_X86_64,
+    STUDY_IR_ACTION_DUMP_ENCODING,
     STUDY_IR_ACTION_EMIT_ASSEMBLY,
+    STUDY_IR_ACTION_EMIT_BINARY,
     STUDY_IR_ACTION_INTERPRET,
-    STUDY_IR_ACTION_BUILD
+    STUDY_IR_ACTION_BUILD_ENCODED,
+    STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY
 } StudyIrAction;
 
 static void study_print_usage(FILE *stream) {
@@ -42,8 +46,11 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump checked INPUT.study\n"
         "  studycc dump ir INPUT.study\n"
         "  studycc dump x86-64 INPUT.study\n"
+        "  studycc dump encoding INPUT.study\n"
         "  studycc emit asm INPUT.study\n"
+        "  studycc emit bin INPUT.study\n"
         "  studycc build INPUT.study -o OUTPUT\n"
+        "  studycc build via-asm INPUT.study -o OUTPUT\n"
         "  studycc check INPUT.study\n"
         "  studycc interpret INPUT.study\n"
         "  studycc --help\n"
@@ -233,6 +240,7 @@ static int study_ir_path(
     StudyCheckedProgram checked;
     StudyIrProgram ir;
     StudyX86Program x86;
+    StudyX86Image image;
     StudyDiagnostic diagnostic;
     uint32_t main_result = 0U;
     int status = STUDY_EXIT_SUCCESS;
@@ -243,6 +251,7 @@ static int study_ir_path(
     study_checked_program_init(&checked);
     study_ir_program_init(&ir);
     study_x86_64_program_init(&x86);
+    study_x86_64_image_init(&image);
     study_diagnostic_clear(&diagnostic);
 
     if (!study_source_read(&source, path, &diagnostic) ||
@@ -266,12 +275,25 @@ static int study_ir_path(
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
     } else if ((action == STUDY_IR_ACTION_DUMP_X86_64 ||
+                action == STUDY_IR_ACTION_DUMP_ENCODING ||
                 action == STUDY_IR_ACTION_EMIT_ASSEMBLY ||
-                action == STUDY_IR_ACTION_BUILD) &&
+                action == STUDY_IR_ACTION_EMIT_BINARY ||
+                action == STUDY_IR_ACTION_BUILD_ENCODED ||
+                action == STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY) &&
                !study_lower_to_x86_64(
                    &ir,
                    &source,
                    &x86,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if ((action == STUDY_IR_ACTION_DUMP_ENCODING ||
+                action == STUDY_IR_ACTION_EMIT_BINARY) &&
+               !study_x86_64_encode(
+                   &x86,
+                   &source,
+                   &image,
                    &diagnostic
                )) {
         study_diagnostic_print(stderr, &diagnostic);
@@ -300,10 +322,29 @@ static int study_ir_path(
                )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_DUMP_ENCODING &&
+               !study_x86_64_image_dump(
+                   stdout,
+                   &x86,
+                   &image,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
     } else if (action == STUDY_IR_ACTION_EMIT_ASSEMBLY &&
                !study_x86_64_emit_assembly(
                    stdout,
                    &x86,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_EMIT_BINARY &&
+               !study_x86_64_image_write(
+                   stdout,
+                   &image,
                    &source,
                    &diagnostic
                )) {
@@ -319,7 +360,16 @@ static int study_ir_path(
                )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
-    } else if (action == STUDY_IR_ACTION_BUILD &&
+    } else if (action == STUDY_IR_ACTION_BUILD_ENCODED &&
+               !study_build_with_encoder_and_system_linker(
+                   &x86,
+                   &source,
+                   build_output,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY &&
                !study_build_with_system_tools(
                    &x86,
                    &source,
@@ -331,6 +381,7 @@ static int study_ir_path(
     }
 
     (void)main_result;
+    study_x86_64_image_free(&image);
     study_x86_64_program_free(&x86);
     study_ir_program_free(&ir);
     study_checked_program_free(&checked);
@@ -380,11 +431,29 @@ int main(int argc, char **argv) {
         );
     }
 
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "encoding") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_DUMP_ENCODING,
+            NULL
+        );
+    }
+
     if (argc == 4 && strcmp(argv[1], "emit") == 0 &&
         strcmp(argv[2], "asm") == 0) {
         return study_ir_path(
             argv[3],
             STUDY_IR_ACTION_EMIT_ASSEMBLY,
+            NULL
+        );
+    }
+
+    if (argc == 4 && strcmp(argv[1], "emit") == 0 &&
+        strcmp(argv[2], "bin") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_EMIT_BINARY,
             NULL
         );
     }
@@ -399,7 +468,21 @@ int main(int argc, char **argv) {
 
     if (argc == 5 && strcmp(argv[1], "build") == 0 &&
         strcmp(argv[3], "-o") == 0) {
-        return study_ir_path(argv[2], STUDY_IR_ACTION_BUILD, argv[4]);
+        return study_ir_path(
+            argv[2],
+            STUDY_IR_ACTION_BUILD_ENCODED,
+            argv[4]
+        );
+    }
+
+    if (argc == 6 && strcmp(argv[1], "build") == 0 &&
+        strcmp(argv[2], "via-asm") == 0 &&
+        strcmp(argv[4], "-o") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY,
+            argv[5]
+        );
     }
 
     study_print_usage(stderr);

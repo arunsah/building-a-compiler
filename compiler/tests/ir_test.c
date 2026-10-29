@@ -12,6 +12,7 @@
 #include "study/token.h"
 #include "study/x86_64.h"
 #include "study/x86_64_assembly.h"
+#include "study/x86_64_encode.h"
 #include "study/x86_64_lower.h"
 #include "study/x86_64_verify.h"
 
@@ -187,6 +188,34 @@ static void lower_x86_fixture(
     assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
 }
 
+static void encode_x86_fixture(
+    IrFixture *fixture,
+    StudyX86Program *x86,
+    StudyX86Image *image
+) {
+    StudyDiagnostic diagnostic;
+
+    lower_x86_fixture(fixture, x86);
+    study_x86_64_image_init(image);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_x86_64_encode(
+        x86,
+        &fixture->source,
+        image,
+        &diagnostic
+    ));
+    assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
+}
+
+static int32_t read_little_endian_i32(const unsigned char *bytes) {
+    uint32_t value = (uint32_t)bytes[0] |
+                     ((uint32_t)bytes[1] << 8U) |
+                     ((uint32_t)bytes[2] << 16U) |
+                     ((uint32_t)bytes[3] << 24U);
+
+    return (int32_t)value;
+}
+
 static void expect_verify_error(IrFixture *fixture, const char *message) {
     StudyDiagnostic diagnostic;
 
@@ -293,6 +322,123 @@ static void test_small_x86_target_shape_and_dump(void) {
     assert(strstr(dump, "mov.i32 #0x0000002a, eax") != NULL);
     assert(strstr(dump, "mov.i32 eax, [rbp-8]") != NULL);
 
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_small_x86_encoding_and_dump(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyDiagnostic diagnostic;
+    FILE *stream;
+    char dump[32768];
+    int32_t call_displacement;
+    size_t call_target;
+    size_t index;
+    bool found_constant = false;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    encode_x86_fixture(&fixture, &x86, &image);
+    assert(image.length > 0U);
+    assert(image.entry_offset == 0U);
+    assert(image.function_count == x86.function_count);
+    assert(image.block_count == x86.block_count);
+    assert(image.instruction_count == x86.instruction_count);
+    assert(image.bytes[0] == UINT8_C(0xe8));
+    call_displacement = read_little_endian_i32(&image.bytes[1]);
+    assert(call_displacement >= 0);
+    call_target = 5U + (size_t)call_displacement;
+    assert(call_target == image.function_offsets[2]);
+
+    for (index = 0U; index < x86.instruction_count; index++) {
+        const StudyX86Instruction *instruction = &x86.instructions[index];
+
+        assert(image.instruction_sizes[index] > 0U);
+        if (instruction->opcode == STUDY_X86_MOV &&
+            instruction->first.kind == STUDY_X86_OPERAND_IMMEDIATE &&
+            instruction->first.width == STUDY_X86_WIDTH_32 &&
+            instruction->first.as.immediate.value == 42U) {
+            size_t offset = image.instruction_offsets[index];
+
+            assert(image.bytes[offset] == UINT8_C(0xb8));
+            assert(image.bytes[offset + 1U] == UINT8_C(0x2a));
+            found_constant = true;
+        }
+    }
+    assert(found_constant);
+
+    stream = tmpfile();
+    assert(stream != NULL);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_x86_64_image_dump(
+        stream,
+        &x86,
+        &image,
+        &fixture.source,
+        &diagnostic
+    ));
+    read_stream(stream, dump, sizeof(dump));
+    assert(fclose(stream) == 0);
+    assert(strstr(dump, "image x86-64-linux-system-v") != NULL);
+    assert(strstr(dump, "function f0 _start @0x00000000") != NULL);
+    assert(strstr(dump, "00000000: e8") != NULL);
+    assert(strstr(dump, "i0 call") != NULL);
+
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_x86_encoder_covers_current_opcode_set(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    bool seen[STUDY_X86_UNDEFINED + 1U] = {false};
+    size_t index;
+
+    lower_text(
+        &fixture,
+        "fn main() -> i32 {\n"
+        "    var value: i32 = 6 * 7;\n"
+        "    if value == 42 { print(value); return 0; }\n"
+        "    else { return -1; }\n"
+        "}\n"
+    );
+    encode_x86_fixture(&fixture, &x86, &image);
+    for (index = 0U; index < x86.instruction_count; index++) {
+        seen[x86.instructions[index].opcode] = true;
+    }
+    for (index = 0U; index <= (size_t)STUDY_X86_UNDEFINED; index++) {
+        assert(seen[index]);
+    }
+
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_x86_encoder_rejects_nonempty_output(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyDiagnostic diagnostic;
+    size_t length;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    encode_x86_fixture(&fixture, &x86, &image);
+    length = image.length;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_x86_64_encode(
+        &x86,
+        &fixture.source,
+        &image,
+        &diagnostic
+    ));
+    assert(image.length == length);
+    assert(strstr(diagnostic.message, "initialised empty output image") != NULL);
+
+    study_x86_64_image_free(&image);
     study_x86_64_program_free(&x86);
     ir_fixture_free(&fixture);
 }
@@ -647,6 +793,9 @@ int main(void) {
     test_small_ir_shape();
     test_small_ir_assembly();
     test_small_x86_target_shape_and_dump();
+    test_small_x86_encoding_and_dump();
+    test_x86_encoder_covers_current_opcode_set();
+    test_x86_encoder_rejects_nonempty_output();
     test_x86_verifier_rejects_cross_function_branch();
     test_x86_verifier_rejects_storage_outside_frame();
     test_x86_lowering_rejects_nonempty_output();

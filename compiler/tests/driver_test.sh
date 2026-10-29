@@ -41,8 +41,12 @@ grep -Fq 'studycc dump ir INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump ir'
 grep -Fq 'studycc dump x86-64 INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump x86-64'
+grep -Fq 'studycc dump encoding INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump encoding'
 grep -Fq 'studycc emit asm INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit asm'
+grep -Fq 'studycc emit bin INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe emit bin'
 grep -Fq 'studycc build INPUT.study -o OUTPUT' "$temporary_directory/stdout" || \
     fail '--help did not describe build'
 grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
@@ -143,6 +147,22 @@ grep -Fq 'call study_fn_0' "$temporary_directory/stdout" || \
 grep -Fq 'movl $0x0000002a, %eax' "$temporary_directory/stdout" || \
     fail 'assembly did not materialise the return value'
 
+expect_status 0 "$compiler" dump encoding examples/return-42.study
+grep -Fq 'image x86-64-linux-system-v [bytes=' \
+    "$temporary_directory/stdout" || \
+    fail 'encoding dump did not name the code image'
+grep -Fq 'function f0 _start @0x00000000' \
+    "$temporary_directory/stdout" || \
+    fail 'encoding dump did not locate the entry function'
+grep -Fq '00000000: e8' "$temporary_directory/stdout" || \
+    fail 'encoding dump did not show the first call bytes'
+
+expect_status 0 "$compiler" emit bin examples/return-42.study
+test -s "$temporary_directory/stdout" || \
+    fail 'binary emission produced an empty code image'
+test "$(od -An -tx1 -N1 "$temporary_directory/stdout" | tr -d ' ')" = e8 || \
+    fail 'binary emission did not begin with a near call'
+
 expect_status 0 "$compiler" interpret examples/return-42.study
 test ! -s "$temporary_directory/stdout" || \
     fail 'return-only interpretation wrote unexpected program output'
@@ -204,12 +224,15 @@ grep -Fq 'bytes: 9000' "$temporary_directory/stdout" || \
     fail 'source buffer did not grow correctly'
 
 if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
-    command -v as >/dev/null 2>&1 && command -v ld >/dev/null 2>&1 &&
+    command -v as >/dev/null 2>&1 &&
+    command -v objcopy >/dev/null 2>&1 &&
+    command -v ld >/dev/null 2>&1 &&
     command -v readelf >/dev/null 2>&1 &&
     as --version 2>/dev/null | grep -Fq 'GNU assembler'; then
     return_executable="$temporary_directory/return-42"
     sum_executable="$temporary_directory/sum-to"
     operations_executable="$temporary_directory/operations"
+    sum_via_assembly="$temporary_directory/sum-to-via-assembly"
     preserved_output="$temporary_directory/preserved-output"
 
     printf 'keep this output\n' >"$preserved_output"
@@ -220,11 +243,17 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
 
     expect_status 1 env PATH=/nonexistent "$compiler" build \
         examples/return-42.study -o "$preserved_output"
+    grep -Fq 'system objcopy adapter exited with status 127' \
+        "$temporary_directory/stderr" || \
+        fail 'missing binary-object adapter was not reported'
+    test "$(cat "$preserved_output")" = 'keep this output' || \
+        fail 'binary-object adapter failure changed the earlier output'
+
+    expect_status 1 env PATH=/nonexistent "$compiler" build via-asm \
+        examples/return-42.study -o "$preserved_output"
     grep -Fq 'system as adapter exited with status 127' \
         "$temporary_directory/stderr" || \
-        fail 'missing assembler was not reported through its adapter'
-    test "$(cat "$preserved_output")" = 'keep this output' || \
-        fail 'assembler failure changed the earlier output'
+        fail 'missing reference assembler was not reported'
 
     expect_status 0 "$compiler" build \
         examples/return-42.study -o "$return_executable"
@@ -237,6 +266,12 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     expect_status 0 "$sum_executable"
     test "$(cat "$temporary_directory/stdout")" = '55' || \
         fail 'native sum-to executable did not print 55'
+
+    expect_status 0 "$compiler" build via-asm \
+        examples/sum-to.study -o "$sum_via_assembly"
+    expect_status 0 "$sum_via_assembly"
+    test "$(cat "$temporary_directory/stdout")" = '55' || \
+        fail 'reference assembly path did not print 55'
 
     readelf -h "$sum_executable" >"$temporary_directory/elf-header"
     grep -Fq 'Class:                             ELF64' \

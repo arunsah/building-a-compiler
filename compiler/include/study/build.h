@@ -20,4 +20,16 @@ bool study_build_with_system_tools(
     StudyDiagnostic *diagnostic
 );
 
+/*
+ * Encode instructions ourselves, wrap the flat image in a temporary ELF
+ * object with GNU objcopy, and invoke GNU ld. The remaining object and linker
+ * adapters are explicit boundaries for the next checkpoints.
+ */
+bool study_build_with_encoder_and_system_linker(
+    const StudyX86Program *program,
+    const StudySource *source,
+    const char *output_path,
+    StudyDiagnostic *diagnostic
+);
+
 #endif

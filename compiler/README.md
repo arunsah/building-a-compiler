@@ -9,7 +9,7 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: an explicit x86-64 target program
+## Current checkpoint: our first x86-64 instruction encoder
 
 The current commands expose every representation and the two execution paths:
 
@@ -21,12 +21,14 @@ make -C compiler
 ./compiler/build/studycc dump checked compiler/examples/return-42.study
 ./compiler/build/studycc dump ir compiler/examples/return-42.study
 ./compiler/build/studycc dump x86-64 compiler/examples/return-42.study
+./compiler/build/studycc dump encoding compiler/examples/return-42.study
 ./compiler/build/studycc emit asm compiler/examples/return-42.study
+./compiler/build/studycc emit bin compiler/examples/return-42.study > /tmp/return-42.bin
 ./compiler/build/studycc check compiler/examples/return-42.study
 ./compiler/build/studycc interpret compiler/examples/sum-to.study
 ```
 
-On Debian Linux x86-64 with GNU `as` and `ld`:
+On Debian Linux x86-64 with GNU `objcopy` and `ld`:
 
 ```sh
 ./compiler/build/studycc build compiler/examples/sum-to.study -o /tmp/sum-to
@@ -86,7 +88,19 @@ branch and call targets, operand kinds and widths, stack-frame bounds, and the
 runtime entry functions. `emit asm` then renders the verified target program
 as GNU assembler text. It does not select instructions or decide storage while
 printing text. This separation matters because our own encoder can consume the
-same target program in the next checkpoint.
+same target program.
+
+`dump encoding` shows where every target function, block, and instruction
+begins in the encoded image. Each instruction line includes the bytes emitted
+for that target instruction. Calls and branches are emitted with four-byte
+placeholders and patched only after every target offset is known. `emit bin`
+writes the same flat code image without a textual or object-file wrapper.
+
+The encoder owns opcode bytes, REX prefixes, ModR/M and SIB bytes, immediates,
+displacements, function alignment, and signed `rel32` call and branch fixups.
+The image keeps function, block, and instruction offsets so byte-level failures
+can be connected to the verified target program. It does not yet own ELF
+sections, symbols, or relocations.
 
 The assembly includes `_start` and a small `print(i32)` runtime. `_start` calls
 Study `main` and invokes the Linux `exit` system call with its result. The
@@ -94,17 +108,18 @@ runtime converts the complete signed value to decimal bytes and writes them
 through the Linux `write` system call. It does not use libc or a dynamic
 loader.
 
-`build` writes that assembly to a temporary directory, invokes the system GNU
-assembler and linker through separate adapter functions, and renames a
-successful executable into place. It never constructs a shell command. A
-failed compilation leaves an earlier output unchanged. This command is
-expected to fail clearly on a host such as macOS where `as` and `ld` do not
-provide the required Linux ELF target.
+`build` encodes the instructions itself. It asks GNU `objcopy` to wrap the flat
+image in one temporary ELF object and GNU `ld` to produce a static executable.
+The earlier assembly path remains available as `build via-asm` for comparison.
+Both paths invoke tools through argument arrays rather than shell commands, and
+they rename a successful executable into place only after every step succeeds.
+A failed compilation leaves an earlier output unchanged.
 
 This is still a temporary native path, not the final backend. The system
-assembler and linker remain visible dependencies. Later checkpoints will
-replace them with our own x86-64 encoder, ELF writer, and bounded linker while
-keeping this target representation as their input boundary.
+assembler is no longer part of the default path, but the object wrapper and
+linker remain visible dependencies. Later checkpoints will replace them with
+our own ELF writer and bounded linker while keeping the target program and
+encoded image as inspectable boundaries.
 
 ## Build and verify
 
@@ -125,10 +140,11 @@ signatures and argument lists, and conservative return-path analysis. IR and
 interpreter tests cover lowering, typed values and slots, branches, loops,
 calls, recursion, signed comparisons, wraparound arithmetic, program output,
 the `main` result, target instruction selection and stack storage, assembly
-rendering, and deliberately corrupted IR and target programs rejected by their
-verifiers. On Linux x86-64 with GNU binutils, the command tests also
-build and run static executables, compare native output with the interpreter,
-check non-zero Study results, and inspect the ELF header and program headers.
+rendering, instruction encoding, relative fixups, and deliberately corrupted
+IR and target programs rejected by their verifiers. On Linux x86-64 with GNU
+binutils, the command tests build and run the encoded and reference-assembly
+paths, compare native output with the interpreter, check non-zero Study
+results, and inspect the ELF header and program headers.
 
 To retain a small environment and verification record in a new directory:
 
@@ -160,6 +176,9 @@ The first native system-tool path records are under
 
 The x86-64 target-lowering and stack-layout records are under
 [`evidence/09-x86-target-ir`](evidence/09-x86-target-ir).
+
+The first instruction-encoding and relative-fixup records are under
+[`evidence/10-x86-encoder`](evidence/10-x86-encoder).
 
 ## Source ownership contract
 
@@ -283,8 +302,23 @@ the assembly renderer.
 
 The lowerer builds a temporary target program, verifies it, and publishes it
 only after the complete program succeeds. `study_x86_64_verify()` checks the
-representation without consulting typed IR. A later encoder can therefore
-trust the same boundary currently used by the assembly renderer.
+representation without consulting typed IR. The encoder and assembly renderer
+can therefore trust the same boundary.
+
+## x86-64 code-image ownership contract
+
+`study_x86_64_encode()` borrows a verified target program and writes into an
+initialised empty `StudyX86Image`. On success, the image owns the flat byte
+array and offset arrays for every target function, block, and instruction.
+Instruction sizes connect each byte range back to the target instruction which
+produced it. The entry offset names the first byte of `_start`.
+
+Calls, jumps, and the two machine instructions produced by one conditional
+target branch use signed `rel32` displacements. The encoder records their
+placeholder positions, emits the complete image, checks every target and
+range, and then patches the little-endian displacements. It publishes no
+partial image on failure. The image is position-independent within its own
+byte array but does not yet contain ELF section, symbol, or relocation data.
 
 ## Temporary native-build contract
 
@@ -301,6 +335,12 @@ temporary ELF object, and GNU `ld` links that object as a static x86-64
 executable. The requested output path is replaced only after both adapters
 succeed. Temporary assembly, object, and unfinished output files are removed
 on every return path.
+
+`study_build_with_encoder_and_system_linker()` follows the same publication
+rule, but writes the encoded image instead of assembly. GNU `objcopy` gives
+that image a temporary ELF `.text` section and `_start` symbol; GNU `ld` still
+places it in a static executable. These adapters are temporary and remain
+separate from instruction encoding.
 
 The generated runtime treats Linux `write` failure as a process failure with
 status 74. The shell can observe only the platform's bounded process status,

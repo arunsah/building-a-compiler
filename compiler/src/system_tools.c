@@ -9,6 +9,7 @@
 static bool study_run_system_tool(
     const char *tool_name,
     char *const arguments[],
+    const char *working_directory,
     const char *source_path,
     StudyDiagnostic *diagnostic
 ) {
@@ -26,6 +27,9 @@ static bool study_run_system_tool(
         return false;
     }
     if (child == 0) {
+        if (working_directory != NULL && chdir(working_directory) != 0) {
+            _exit(125);
+        }
         execvp(tool_name, arguments);
         _exit(errno == ENOENT ? 127 : 126);
     }
@@ -96,6 +100,44 @@ bool study_system_assemble_x86_64(
     return study_run_system_tool(
         "as",
         arguments,
+        NULL,
+        source_path,
+        diagnostic
+    );
+}
+
+bool study_system_wrap_x86_64_binary(
+    const char *directory,
+    const char *binary_name,
+    const char *object_name,
+    const char *source_path,
+    StudyDiagnostic *diagnostic
+) {
+    char *arguments[] = {
+        (char *)"objcopy",
+        (char *)"-I",
+        (char *)"binary",
+        (char *)"-O",
+        (char *)"elf64-x86-64",
+        (char *)"-B",
+        (char *)"i386:x86-64",
+        (char *)"--rename-section",
+        (char *)".data=.text,alloc,load,readonly,code,contents",
+        (char *)"--redefine-sym",
+        (char *)"_binary_program_bin_start=_start",
+        (char *)"--redefine-sym",
+        (char *)"_binary_program_bin_end=_study_image_end",
+        (char *)"--redefine-sym",
+        (char *)"_binary_program_bin_size=_study_image_size",
+        (char *)binary_name,
+        (char *)object_name,
+        NULL
+    };
+
+    return study_run_system_tool(
+        "objcopy",
+        arguments,
+        directory,
         source_path,
         diagnostic
     );
@@ -121,6 +163,7 @@ bool study_system_link_x86_64(
     return study_run_system_tool(
         "ld",
         arguments,
+        NULL,
         source_path,
         diagnostic
     );

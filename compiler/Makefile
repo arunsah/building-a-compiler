@@ -10,7 +10,7 @@ LDFLAGS ?=
 LIB_SOURCES := src/diagnostic.c src/source.c src/token.c src/lexer.c \
 	src/syntax.c src/parser.c src/checked.c src/checker.c src/ir.c \
 	src/ir_verify.c src/lower.c src/interpreter.c src/x86_64_assembly.c \
-	src/x86_64.c src/x86_64_lower.c src/x86_64_verify.c \
+	src/x86_64.c src/x86_64_encode.c src/x86_64_lower.c src/x86_64_verify.c \
 	src/system_tools.c src/build.c
 HEADERS := include/study/build.h include/study/checked.h include/study/checker.h \
 	include/study/diagnostic.h include/study/lexer.h include/study/location.h \
@@ -18,7 +18,8 @@ HEADERS := include/study/build.h include/study/checked.h include/study/checker.h
 	include/study/lower.h include/study/parser.h include/study/source.h \
 	include/study/syntax.h include/study/system_tools.h include/study/token.h \
 	include/study/x86_64.h include/study/x86_64_assembly.h \
-	include/study/x86_64_lower.h include/study/x86_64_verify.h
+	include/study/x86_64_encode.h include/study/x86_64_lower.h \
+	include/study/x86_64_verify.h
 
 .PHONY: all test sanitize clean
 
