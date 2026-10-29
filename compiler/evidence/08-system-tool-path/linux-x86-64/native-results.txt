@@ -1,0 +1,5 @@
+native-execution=passed
+return-42-status=42
+sum-to-status=0
+operations-status=37
+interpreter-native-output=identical

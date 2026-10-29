@@ -157,15 +157,17 @@ if [ "$(uname -s)" = Linux ] && [ "$(uname -m)" = x86_64 ] &&
         printf 'interpreter-native-output=identical\n'
     } >"$output_directory/native-results.txt"
 
-    file "$sum_executable" >"$output_directory/sum-to.file.txt"
-    readelf -h "$sum_executable" >"$output_directory/sum-to.elf-header.txt"
-    readelf -l "$sum_executable" \
+    file "$sum_executable" | sed 's/[[:space:]]*$//' \
+        >"$output_directory/sum-to.file.txt"
+    readelf -h "$sum_executable" | sed 's/[[:space:]]*$//' \
+        >"$output_directory/sum-to.elf-header.txt"
+    readelf -l "$sum_executable" | sed 's/[[:space:]]*$//' \
         >"$output_directory/sum-to.program-headers.txt"
-    readelf -S "$sum_executable" \
+    readelf -S "$sum_executable" | sed 's/[[:space:]]*$//' \
         >"$output_directory/sum-to.section-headers.txt"
-    nm --numeric-sort "$sum_executable" \
+    nm --numeric-sort "$sum_executable" | sed 's/[[:space:]]*$//' \
         >"$output_directory/sum-to.symbols.txt"
-    objdump -d "$sum_executable" \
+    objdump -d "$sum_executable" | sed 's/[[:space:]]*$//' \
         >"$output_directory/sum-to.disassembly.txt"
 
     grep -Fq 'Class:                             ELF64' \

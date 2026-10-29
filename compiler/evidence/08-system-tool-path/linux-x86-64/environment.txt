@@ -1,0 +1,9 @@
+recorded-utc=2026-10-29T15:25:50Z
+system=Linux
+release=6.12.113+deb13-amd64
+machine=x86_64
+source-revision=32b47ae443526be35bead57398d7f2a8a10e32c1
+cc=cc (Debian 14.2.0-19) 14.2.0
+make=GNU Make 4.4.1
+assembler=/usr/bin/as
+linker=/usr/bin/ld

@@ -1,0 +1,139 @@
+
+/tmp/study-native-record.3rDiKS/sum-to:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	e8 3b 01 00 00       	call   401140 <study_fn_1>
+  401005:	89 c7                	mov    %eax,%edi
+  401007:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  40100c:	0f 05                	syscall
+  40100e:	66 90                	xchg   %ax,%ax
+
+0000000000401010 <study_rt_print_i32>:
+  401010:	55                   	push   %rbp
+  401011:	48 89 e5             	mov    %rsp,%rbp
+  401014:	48 83 ec 40          	sub    $0x40,%rsp
+  401018:	45 31 c0             	xor    %r8d,%r8d
+  40101b:	89 f8                	mov    %edi,%eax
+  40101d:	85 c0                	test   %eax,%eax
+  40101f:	79 08                	jns    401029 <study_rt_print_i32+0x19>
+  401021:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+  401027:	f7 d8                	neg    %eax
+  401029:	48 8d 75 ff          	lea    -0x1(%rbp),%rsi
+  40102d:	c6 06 0a             	movb   $0xa,(%rsi)
+  401030:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+  401036:	85 c0                	test   %eax,%eax
+  401038:	75 0b                	jne    401045 <study_rt_print_i32+0x35>
+  40103a:	48 ff ce             	dec    %rsi
+  40103d:	c6 06 30             	movb   $0x30,(%rsi)
+  401040:	49 ff c1             	inc    %r9
+  401043:	eb 18                	jmp    40105d <study_rt_print_i32+0x4d>
+  401045:	31 d2                	xor    %edx,%edx
+  401047:	b9 0a 00 00 00       	mov    $0xa,%ecx
+  40104c:	f7 f1                	div    %ecx
+  40104e:	80 c2 30             	add    $0x30,%dl
+  401051:	48 ff ce             	dec    %rsi
+  401054:	88 16                	mov    %dl,(%rsi)
+  401056:	49 ff c1             	inc    %r9
+  401059:	85 c0                	test   %eax,%eax
+  40105b:	75 e8                	jne    401045 <study_rt_print_i32+0x35>
+  40105d:	45 85 c0             	test   %r8d,%r8d
+  401060:	74 09                	je     40106b <study_rt_print_i32+0x5b>
+  401062:	48 ff ce             	dec    %rsi
+  401065:	c6 06 2d             	movb   $0x2d,(%rsi)
+  401068:	49 ff c1             	inc    %r9
+  40106b:	4c 89 ca             	mov    %r9,%rdx
+  40106e:	b8 01 00 00 00       	mov    $0x1,%eax
+  401073:	bf 01 00 00 00       	mov    $0x1,%edi
+  401078:	0f 05                	syscall
+  40107a:	48 83 f8 fc          	cmp    $0xfffffffffffffffc,%rax
+  40107e:	74 ee                	je     40106e <study_rt_print_i32+0x5e>
+  401080:	48 85 c0             	test   %rax,%rax
+  401083:	7e 0a                	jle    40108f <study_rt_print_i32+0x7f>
+  401085:	48 01 c6             	add    %rax,%rsi
+  401088:	48 29 c2             	sub    %rax,%rdx
+  40108b:	75 e1                	jne    40106e <study_rt_print_i32+0x5e>
+  40108d:	c9                   	leave
+  40108e:	c3                   	ret
+  40108f:	bf 4a 00 00 00       	mov    $0x4a,%edi
+  401094:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  401099:	0f 05                	syscall
+  40109b:	0f 0b                	ud2
+  40109d:	0f 1f 00             	nopl   (%rax)
+
+00000000004010a0 <study_fn_0>:
+  4010a0:	55                   	push   %rbp
+  4010a1:	48 89 e5             	mov    %rsp,%rbp
+  4010a4:	48 81 ec 80 00 00 00 	sub    $0x80,%rsp
+  4010ab:	89 7d f8             	mov    %edi,-0x8(%rbp)
+  4010ae:	b8 01 00 00 00       	mov    $0x1,%eax
+  4010b3:	89 45 e0             	mov    %eax,-0x20(%rbp)
+  4010b6:	8b 45 e0             	mov    -0x20(%rbp),%eax
+  4010b9:	89 45 f0             	mov    %eax,-0x10(%rbp)
+  4010bc:	b8 00 00 00 00       	mov    $0x0,%eax
+  4010c1:	89 45 d8             	mov    %eax,-0x28(%rbp)
+  4010c4:	8b 45 d8             	mov    -0x28(%rbp),%eax
+  4010c7:	89 45 e8             	mov    %eax,-0x18(%rbp)
+  4010ca:	eb 00                	jmp    4010cc <study_fn_0+0x2c>
+  4010cc:	8b 45 f0             	mov    -0x10(%rbp),%eax
+  4010cf:	89 45 d0             	mov    %eax,-0x30(%rbp)
+  4010d2:	8b 45 f8             	mov    -0x8(%rbp),%eax
+  4010d5:	89 45 c8             	mov    %eax,-0x38(%rbp)
+  4010d8:	8b 45 d0             	mov    -0x30(%rbp),%eax
+  4010db:	3b 45 c8             	cmp    -0x38(%rbp),%eax
+  4010de:	0f 9e c0             	setle  %al
+  4010e1:	0f b6 c0             	movzbl %al,%eax
+  4010e4:	89 45 c0             	mov    %eax,-0x40(%rbp)
+  4010e7:	83 7d c0 00          	cmpl   $0x0,-0x40(%rbp)
+  4010eb:	75 02                	jne    4010ef <study_fn_0+0x4f>
+  4010ed:	eb 3a                	jmp    401129 <study_fn_0+0x89>
+  4010ef:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  4010f2:	89 45 b8             	mov    %eax,-0x48(%rbp)
+  4010f5:	8b 45 f0             	mov    -0x10(%rbp),%eax
+  4010f8:	89 45 b0             	mov    %eax,-0x50(%rbp)
+  4010fb:	8b 45 b8             	mov    -0x48(%rbp),%eax
+  4010fe:	03 45 b0             	add    -0x50(%rbp),%eax
+  401101:	89 45 a8             	mov    %eax,-0x58(%rbp)
+  401104:	8b 45 a8             	mov    -0x58(%rbp),%eax
+  401107:	89 45 e8             	mov    %eax,-0x18(%rbp)
+  40110a:	8b 45 f0             	mov    -0x10(%rbp),%eax
+  40110d:	89 45 a0             	mov    %eax,-0x60(%rbp)
+  401110:	b8 01 00 00 00       	mov    $0x1,%eax
+  401115:	89 45 98             	mov    %eax,-0x68(%rbp)
+  401118:	8b 45 a0             	mov    -0x60(%rbp),%eax
+  40111b:	03 45 98             	add    -0x68(%rbp),%eax
+  40111e:	89 45 90             	mov    %eax,-0x70(%rbp)
+  401121:	8b 45 90             	mov    -0x70(%rbp),%eax
+  401124:	89 45 f0             	mov    %eax,-0x10(%rbp)
+  401127:	eb a3                	jmp    4010cc <study_fn_0+0x2c>
+  401129:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  40112c:	89 45 88             	mov    %eax,-0x78(%rbp)
+  40112f:	8b 45 88             	mov    -0x78(%rbp),%eax
+  401132:	c9                   	leave
+  401133:	c3                   	ret
+  401134:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+  40113b:	00 00 00 00
+  40113f:	90                   	nop
+
+0000000000401140 <study_fn_1>:
+  401140:	55                   	push   %rbp
+  401141:	48 89 e5             	mov    %rsp,%rbp
+  401144:	48 83 ec 30          	sub    $0x30,%rsp
+  401148:	b8 0a 00 00 00       	mov    $0xa,%eax
+  40114d:	89 45 f0             	mov    %eax,-0x10(%rbp)
+  401150:	8b 7d f0             	mov    -0x10(%rbp),%edi
+  401153:	e8 48 ff ff ff       	call   4010a0 <study_fn_0>
+  401158:	89 45 e8             	mov    %eax,-0x18(%rbp)
+  40115b:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  40115e:	89 45 f8             	mov    %eax,-0x8(%rbp)
+  401161:	8b 45 f8             	mov    -0x8(%rbp),%eax
+  401164:	89 45 e0             	mov    %eax,-0x20(%rbp)
+  401167:	8b 7d e0             	mov    -0x20(%rbp),%edi
+  40116a:	e8 a1 fe ff ff       	call   401010 <study_rt_print_i32>
+  40116f:	b8 00 00 00 00       	mov    $0x0,%eax
+  401174:	89 45 d8             	mov    %eax,-0x28(%rbp)
+  401177:	8b 45 d8             	mov    -0x28(%rbp),%eax
+  40117a:	c9                   	leave
+  40117b:	c3                   	ret

@@ -1,0 +1,4 @@
+strict-warning-tests=passed
+assembly-emission-tests=passed
+system-tool-adapter-tests=passed
+output-publication-tests=passed
