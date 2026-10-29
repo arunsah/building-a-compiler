@@ -9,7 +9,7 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: typed IR and reference interpretation
+## Current checkpoint: first native path through system tools
 
 The driver can show both the source metadata and the token stream:
 
@@ -20,8 +20,16 @@ make -C compiler
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
 ./compiler/build/studycc dump checked compiler/examples/return-42.study
 ./compiler/build/studycc dump ir compiler/examples/return-42.study
+./compiler/build/studycc emit asm compiler/examples/return-42.study
 ./compiler/build/studycc check compiler/examples/return-42.study
 ./compiler/build/studycc interpret compiler/examples/sum-to.study
+```
+
+On Debian Linux x86-64 with GNU `as` and `ld`:
+
+```sh
+./compiler/build/studycc build compiler/examples/sum-to.study -o /tmp/sum-to
+/tmp/sum-to
 ```
 
 Expected shape:
@@ -62,8 +70,32 @@ reachability, and the `main` boundary without consulting the syntax tree.
 program's `print` output. The command still returns the compiler's success or
 failure status; the interpreter API returns the exact `i32` result separately.
 Arithmetic uses unsigned C operations to implement Study's 32-bit wraparound
-rules without relying on signed C overflow. Native code generation is not
-implemented yet.
+rules without relying on signed C overflow.
+
+`emit asm` lowers the verified IR directly to GNU assembler text for the first
+Linux x86-64 System V path. Every mutable slot and temporary value receives a
+simple stack location. Generated functions use 16-byte-aligned frames, the
+first six integer argument registers, explicit block labels, and 32-bit
+operations with the same wraparound and signed-comparison behaviour as the
+interpreter.
+
+The assembly includes `_start` and a small `print(i32)` runtime. `_start` calls
+Study `main` and invokes the Linux `exit` system call with its result. The
+runtime converts the complete signed value to decimal bytes and writes them
+through the Linux `write` system call. It does not use libc or a dynamic
+loader.
+
+`build` writes that assembly to a temporary directory, invokes the system GNU
+assembler and linker through separate adapter functions, and renames a
+successful executable into place. It never constructs a shell command. A
+failed compilation leaves an earlier output unchanged. This command is
+expected to fail clearly on a host such as macOS where `as` and `ld` do not
+provide the required Linux ELF target.
+
+This is the first native vertical slice, not the final backend. The system
+assembler and linker remain visible temporary dependencies. Later checkpoints
+will add a target representation and replace them with our own x86-64 encoder,
+ELF writer, and bounded linker.
 
 ## Build and verify
 
@@ -83,7 +115,10 @@ same-scope duplicates, unknown names, every current type rule, function
 signatures and argument lists, and conservative return-path analysis. IR and
 interpreter tests cover lowering, typed values and slots, branches, loops,
 calls, recursion, signed comparisons, wraparound arithmetic, program output,
-the `main` result, and deliberately corrupted IR rejected by the verifier.
+the `main` result, assembly selection, and deliberately corrupted IR rejected
+by the verifier. On Linux x86-64 with GNU binutils, the command tests also
+build and run static executables, compare native output with the interpreter,
+check non-zero Study results, and inspect the ELF header and program headers.
 
 To retain a small environment and verification record in a new directory:
 
@@ -213,6 +248,26 @@ The reference interpreter verifies its input again. It limits nested calls to
 or non-terminating input cannot consume the host without a stated boundary.
 Those limits belong to the reference tool, not to the meaning of a future
 native executable.
+
+## Temporary native-build contract
+
+`study_x86_64_emit_assembly()` verifies the IR before writing target assembly.
+The emitted functions use numeric labels rather than source identifiers, so
+their symbols remain valid even as the source language later accepts richer
+names. A stack layout is private to one emitted function. Slots and values from
+another function cannot receive an address in that frame.
+
+`study_build_with_system_tools()` owns only its temporary directory and paths.
+The IR and source remain borrowed. The GNU assembler creates one temporary ELF
+object, and GNU `ld` links that object as a static x86-64 executable. The
+requested output path is replaced only after both adapters succeed. Temporary
+assembly, object, and unfinished output files are removed on every return
+path.
+
+The generated runtime treats Linux `write` failure as a process failure with
+status 74. The shell can observe only the platform's bounded process status,
+so programs should use `print` when a complete signed `i32` must remain
+visible.
 
 ## Exit status
 

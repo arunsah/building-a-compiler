@@ -28,8 +28,10 @@ boundary, turns the source into tokens with exact ranges, and parses the
 complete first grammar into a syntax tree. It now also resolves function and
 local names, checks expression types and calls, and verifies return paths. It
 now lowers the checked program into typed basic blocks, verifies that IR, and
-executes it with a small reference interpreter. It does not generate native
-code yet.
+executes it with a small reference interpreter. It can now also emit GNU
+x86-64 assembly and, on Debian Linux x86-64, produce a static executable
+through explicitly named system assembler and linker adapters. Those adapters
+are temporary and are not the final compiler path.
 
 ```sh
 make -C compiler test
@@ -39,8 +41,10 @@ make -C compiler sanitize
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
 ./compiler/build/studycc dump checked compiler/examples/return-42.study
 ./compiler/build/studycc dump ir compiler/examples/return-42.study
+./compiler/build/studycc emit asm compiler/examples/return-42.study
 ./compiler/build/studycc check compiler/examples/return-42.study
 ./compiler/build/studycc interpret compiler/examples/sum-to.study
+./compiler/build/studycc build compiler/examples/sum-to.study -o /tmp/sum-to
 ```
 
 See the [compiler README](compiler/README.md) for the ownership contract,

@@ -1,3 +1,4 @@
+#include "study/build.h"
 #include "study/checked.h"
 #include "study/checker.h"
 #include "study/diagnostic.h"
@@ -9,6 +10,7 @@
 #include "study/source.h"
 #include "study/syntax.h"
 #include "study/token.h"
+#include "study/x86_64_assembly.h"
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -20,6 +22,13 @@ enum {
     STUDY_EXIT_USAGE = 2
 };
 
+typedef enum StudyIrAction {
+    STUDY_IR_ACTION_DUMP,
+    STUDY_IR_ACTION_EMIT_ASSEMBLY,
+    STUDY_IR_ACTION_INTERPRET,
+    STUDY_IR_ACTION_BUILD
+} StudyIrAction;
+
 static void study_print_usage(FILE *stream) {
     (void)fprintf(
         stream,
@@ -29,6 +38,8 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump ast INPUT.study\n"
         "  studycc dump checked INPUT.study\n"
         "  studycc dump ir INPUT.study\n"
+        "  studycc emit asm INPUT.study\n"
+        "  studycc build INPUT.study -o OUTPUT\n"
         "  studycc check INPUT.study\n"
         "  studycc interpret INPUT.study\n"
         "  studycc --help\n"
@@ -207,7 +218,11 @@ static int study_check_path(const char *path, bool dump_checked) {
     return status;
 }
 
-static int study_ir_path(const char *path, bool dump_ir, bool interpret) {
+static int study_ir_path(
+    const char *path,
+    StudyIrAction action,
+    const char *build_output
+) {
     StudySource source;
     StudyTokenList tokens;
     StudySyntaxTree tree;
@@ -244,7 +259,7 @@ static int study_ir_path(const char *path, bool dump_ir, bool interpret) {
         )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
-    } else if (dump_ir &&
+    } else if (action == STUDY_IR_ACTION_DUMP &&
                !study_ir_program_dump(
                    stdout,
                    &ir,
@@ -259,12 +274,30 @@ static int study_ir_path(const char *path, bool dump_ir, bool interpret) {
         );
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
-    } else if (interpret &&
+    } else if (action == STUDY_IR_ACTION_EMIT_ASSEMBLY &&
+               !study_x86_64_emit_assembly(
+                   stdout,
+                   &ir,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_INTERPRET &&
                !study_ir_interpret(
                    &ir,
                    &source,
                    stdout,
                    &main_result,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_BUILD &&
+               !study_build_with_system_tools(
+                   &ir,
+                   &source,
+                   build_output,
                    &diagnostic
                )) {
         study_diagnostic_print(stderr, &diagnostic);
@@ -308,7 +341,16 @@ int main(int argc, char **argv) {
 
     if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
         strcmp(argv[2], "ir") == 0) {
-        return study_ir_path(argv[3], true, false);
+        return study_ir_path(argv[3], STUDY_IR_ACTION_DUMP, NULL);
+    }
+
+    if (argc == 4 && strcmp(argv[1], "emit") == 0 &&
+        strcmp(argv[2], "asm") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_EMIT_ASSEMBLY,
+            NULL
+        );
     }
 
     if (argc == 3 && strcmp(argv[1], "check") == 0) {
@@ -316,7 +358,12 @@ int main(int argc, char **argv) {
     }
 
     if (argc == 3 && strcmp(argv[1], "interpret") == 0) {
-        return study_ir_path(argv[2], false, true);
+        return study_ir_path(argv[2], STUDY_IR_ACTION_INTERPRET, NULL);
+    }
+
+    if (argc == 5 && strcmp(argv[1], "build") == 0 &&
+        strcmp(argv[3], "-o") == 0) {
+        return study_ir_path(argv[2], STUDY_IR_ACTION_BUILD, argv[4]);
     }
 
     study_print_usage(stderr);

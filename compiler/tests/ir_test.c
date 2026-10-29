@@ -10,6 +10,7 @@
 #include "study/source.h"
 #include "study/syntax.h"
 #include "study/token.h"
+#include "study/x86_64_assembly.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -135,6 +136,27 @@ static uint32_t interpret_fixture(
     return result;
 }
 
+static void emit_assembly_fixture(
+    IrFixture *fixture,
+    char *output,
+    size_t output_capacity
+) {
+    StudyDiagnostic diagnostic;
+    FILE *stream = tmpfile();
+
+    assert(stream != NULL);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_x86_64_emit_assembly(
+        stream,
+        &fixture->ir,
+        &fixture->source,
+        &diagnostic
+    ));
+    assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
+    read_stream(stream, output, output_capacity);
+    assert(fclose(stream) == 0);
+}
+
 static void expect_verify_error(IrFixture *fixture, const char *message) {
     StudyDiagnostic diagnostic;
 
@@ -185,6 +207,20 @@ static void test_small_ir_shape(void) {
     ir_fixture_free(&fixture);
 }
 
+static void test_small_ir_assembly(void) {
+    IrFixture fixture;
+    char assembly[8192];
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    emit_assembly_fixture(&fixture, assembly, sizeof(assembly));
+    assert(strstr(assembly, ".globl _start\n") != NULL);
+    assert(strstr(assembly, "  call study_fn_0\n") != NULL);
+    assert(strstr(assembly, "  movl $0x0000002a, %eax\n") != NULL);
+    assert(strstr(assembly, "  movl %eax, %edi\n") != NULL);
+    assert(strstr(assembly, ".section .note.GNU-stack") != NULL);
+    ir_fixture_free(&fixture);
+}
+
 static void test_loop_call_print_and_result(void) {
     static const char text[] =
         "fn sum_to(limit: i32) -> i32 {\n"
@@ -216,6 +252,36 @@ static void test_loop_call_print_and_result(void) {
     assert(result == 0U);
     assert(strcmp(output, "55\n") == 0);
 
+    ir_fixture_free(&fixture);
+}
+
+static void test_loop_call_and_print_assembly(void) {
+    static const char text[] =
+        "fn sum_to(limit: i32) -> i32 {\n"
+        "    var current: i32 = 1;\n"
+        "    var total: i32 = 0;\n"
+        "    while current <= limit {\n"
+        "        total = total + current;\n"
+        "        current = current + 1;\n"
+        "    }\n"
+        "    return total;\n"
+        "}\n"
+        "fn main() -> i32 {\n"
+        "    var answer: i32 = sum_to(10);\n"
+        "    print(answer);\n"
+        "    return 0;\n"
+        "}\n";
+    IrFixture fixture;
+    char assembly[16384];
+
+    lower_text(&fixture, text);
+    emit_assembly_fixture(&fixture, assembly, sizeof(assembly));
+    assert(strstr(assembly, "_start:\n  call study_fn_1\n") != NULL);
+    assert(strstr(assembly, "  call study_fn_0\n") != NULL);
+    assert(strstr(assembly, "  setle %al\n") != NULL);
+    assert(strstr(assembly, "  jne .Lstudy_f0_b2\n") != NULL);
+    assert(strstr(assembly, "  call study_rt_print_i32\n") != NULL);
+    assert(strstr(assembly, ".Lstudy_print_write_again:\n") != NULL);
     ir_fixture_free(&fixture);
 }
 
@@ -433,7 +499,9 @@ static void test_nonempty_output_is_rejected(void) {
 
 int main(void) {
     test_small_ir_shape();
+    test_small_ir_assembly();
     test_loop_call_print_and_result();
+    test_loop_call_and_print_assembly();
     test_wraparound_and_signed_comparison();
     test_boolean_rules_and_both_returning_branches();
     test_recursive_calls();

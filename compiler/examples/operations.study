@@ -1,0 +1,32 @@
+fn count_down(value: i32) -> i32 {
+    if value == 0 {
+        return 0;
+    } else {
+        return count_down(value - 1) + 1;
+    }
+}
+
+fn add_six(a: i32, b: i32, c: i32, d: i32, e: i32, f: i32) -> i32 {
+    return a + b + c + d + e + f;
+}
+
+fn main() -> i32 {
+    var sum: i32 = add_six(1, 2, 3, 4, 5, 6);
+    var calculated: i32 = (6 * 7) - 2;
+    var wrapped: i32 = 2147483647 + 1;
+
+    print(sum);
+    print(calculated);
+    print(wrapped);
+    print(-7);
+    print(count_down(5));
+
+    if !(sum != 21) { print(1); } else { print(0); }
+    if sum < 22 { print(2); } else { print(0); }
+    if sum <= 21 { print(3); } else { print(0); }
+    if sum > 20 { print(4); } else { print(0); }
+    if sum >= 21 { print(5); } else { print(0); }
+    if true == true { print(6); } else { print(0); }
+
+    return 37;
+}

@@ -39,6 +39,10 @@ grep -Fq 'studycc dump checked INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump checked'
 grep -Fq 'studycc dump ir INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump ir'
+grep -Fq 'studycc emit asm INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe emit asm'
+grep -Fq 'studycc build INPUT.study -o OUTPUT' "$temporary_directory/stdout" || \
+    fail '--help did not describe build'
 grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe check'
 grep -Fq 'studycc interpret INPUT.study' "$temporary_directory/stdout" || \
@@ -118,6 +122,14 @@ grep -Fq '%v0: i32 = const.i32 42' "$temporary_directory/stdout" || \
 grep -Fq 'return %v0' "$temporary_directory/stdout" || \
     fail 'IR dump did not include the return terminator'
 
+expect_status 0 "$compiler" emit asm examples/return-42.study
+grep -Fq '.globl _start' "$temporary_directory/stdout" || \
+    fail 'assembly did not export the process entry point'
+grep -Fq 'call study_fn_0' "$temporary_directory/stdout" || \
+    fail 'assembly entry point did not call Study main'
+grep -Fq 'movl $0x0000002a, %eax' "$temporary_directory/stdout" || \
+    fail 'assembly did not materialise the return value'
+
 expect_status 0 "$compiler" interpret examples/return-42.study
 test ! -s "$temporary_directory/stdout" || \
     fail 'return-only interpretation wrote unexpected program output'
@@ -177,5 +189,70 @@ awk 'BEGIN { for (i = 0; i < 9000; i++) printf "x" }' >"$large_path"
 expect_status 0 "$compiler" dump source "$large_path"
 grep -Fq 'bytes: 9000' "$temporary_directory/stdout" || \
     fail 'source buffer did not grow correctly'
+
+if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
+    command -v as >/dev/null 2>&1 && command -v ld >/dev/null 2>&1 &&
+    command -v readelf >/dev/null 2>&1 &&
+    as --version 2>/dev/null | grep -Fq 'GNU assembler'; then
+    return_executable="$temporary_directory/return-42"
+    sum_executable="$temporary_directory/sum-to"
+    operations_executable="$temporary_directory/operations"
+    preserved_output="$temporary_directory/preserved-output"
+
+    printf 'keep this output\n' >"$preserved_output"
+    expect_status 1 "$compiler" build \
+        examples/invalid/type-mismatch.study -o "$preserved_output"
+    test "$(cat "$preserved_output")" = 'keep this output' || \
+        fail 'failed build changed the earlier output'
+
+    expect_status 1 env PATH=/nonexistent "$compiler" build \
+        examples/return-42.study -o "$preserved_output"
+    grep -Fq 'system as adapter exited with status 127' \
+        "$temporary_directory/stderr" || \
+        fail 'missing assembler was not reported through its adapter'
+    test "$(cat "$preserved_output")" = 'keep this output' || \
+        fail 'assembler failure changed the earlier output'
+
+    expect_status 0 "$compiler" build \
+        examples/return-42.study -o "$return_executable"
+    test -x "$return_executable" || \
+        fail 'build did not produce an executable file'
+    expect_status 42 "$return_executable"
+
+    expect_status 0 "$compiler" build \
+        examples/sum-to.study -o "$sum_executable"
+    expect_status 0 "$sum_executable"
+    test "$(cat "$temporary_directory/stdout")" = '55' || \
+        fail 'native sum-to executable did not print 55'
+
+    readelf -h "$sum_executable" >"$temporary_directory/elf-header"
+    grep -Fq 'Class:                             ELF64' \
+        "$temporary_directory/elf-header" || \
+        fail 'native output is not ELF64'
+    grep -Fq 'Type:                              EXEC' \
+        "$temporary_directory/elf-header" || \
+        fail 'native output is not ET_EXEC'
+    grep -Fq 'Machine:                           Advanced Micro Devices X86-64' \
+        "$temporary_directory/elf-header" || \
+        fail 'native output is not x86-64'
+    if readelf -l "$sum_executable" | grep -Fq 'INTERP'; then
+        fail 'native output unexpectedly requires a dynamic interpreter'
+    fi
+
+    expect_status 0 "$compiler" build \
+        examples/operations.study -o "$operations_executable"
+    expect_status 0 "$compiler" interpret examples/operations.study
+    cp "$temporary_directory/stdout" \
+        "$temporary_directory/operations-reference"
+    expect_status 37 "$operations_executable"
+    printf '21\n40\n-2147483648\n-7\n5\n1\n2\n3\n4\n5\n6\n' \
+        >"$temporary_directory/operations-expected"
+    cmp "$temporary_directory/operations-expected" \
+        "$temporary_directory/stdout" || \
+        fail 'native operations executable disagreed with expected output'
+    cmp "$temporary_directory/operations-reference" \
+        "$temporary_directory/stdout" || \
+        fail 'native operations executable disagreed with the interpreter'
+fi
 
 printf 'driver tests passed\n'
