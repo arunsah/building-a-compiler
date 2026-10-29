@@ -3,4 +3,5 @@ make BUILD_DIR=<temporary>/sanitize \
   CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
   LDFLAGS='-fsanitize=address,undefined' test
 <temporary>/strict/studycc dump ir examples/return-42.study
+<temporary>/strict/studycc dump ir examples/sum-to.study
 <temporary>/strict/studycc interpret examples/sum-to.study

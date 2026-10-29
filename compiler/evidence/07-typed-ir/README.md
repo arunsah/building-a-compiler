@@ -2,7 +2,7 @@
 
 These records were generated on 29 October 2026 by
 `compiler/record-ir-evidence.sh` from source revision
-`63c8896c6ee5d325241bc2d2677c47cc41531ac7`.
+`3136e33ea47487cb49bb62cce6962cb32a56ca1b`.
 
 | Record | What it establishes |
 | --- | --- |

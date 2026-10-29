@@ -1,0 +1,43 @@
+function @sum_to(%s0: i32) -> i32 {
+  slots:
+    %s0 limit: i32  parameter
+    %s1 current: i32
+    %s2 total: i32
+  b0:  ; entry
+    %v0: i32 = const.i32 1  ; 2:24..2:25
+    store %s1, %v0  ; 2:5..2:26
+    %v1: i32 = const.i32 0  ; 3:22..3:23
+    store %s2, %v1  ; 3:5..3:24
+    jump b1  ; 5:5..8:6
+  b1:
+    %v2: i32 = load %s1  ; 5:11..5:18
+    %v3: i32 = load %s0  ; 5:22..5:27
+    %v4: bool = less-equal.i32 %v2, %v3  ; 5:11..5:27
+    branch %v4, b2, b3  ; 5:5..8:6
+  b2:
+    %v5: i32 = load %s2  ; 6:17..6:22
+    %v6: i32 = load %s1  ; 6:25..6:32
+    %v7: i32 = add.i32 %v5, %v6  ; 6:17..6:32
+    store %s2, %v7  ; 6:9..6:33
+    %v8: i32 = load %s1  ; 7:19..7:26
+    %v9: i32 = const.i32 1  ; 7:29..7:30
+    %v10: i32 = add.i32 %v8, %v9  ; 7:19..7:30
+    store %s1, %v10  ; 7:9..7:31
+    jump b1  ; 5:5..8:6
+  b3:
+    %v11: i32 = load %s2  ; 10:12..10:17
+    return %v11  ; 10:5..10:18
+}
+
+function @main() -> i32 {
+  slots:
+    %s3 answer: i32
+  b4:  ; entry
+    %v12: i32 = const.i32 10  ; 14:30..14:32
+    %v13: i32 = call @sum_to(%v12)  ; 14:23..14:33
+    store %s3, %v13  ; 14:5..14:34
+    %v14: i32 = load %s3  ; 15:11..15:17
+    print.i32 %v14  ; 15:5..15:19
+    %v15: i32 = const.i32 0  ; 16:12..16:13
+    return %v15  ; 16:5..16:14
+}
