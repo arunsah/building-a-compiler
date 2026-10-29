@@ -33,6 +33,8 @@ grep -Fq 'studycc dump source INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump source'
 grep -Fq 'studycc dump tokens INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump tokens'
+grep -Fq 'studycc dump ast INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump ast'
 
 expect_status 2 "$compiler"
 grep -Fq 'Usage:' "$temporary_directory/stderr" || \
@@ -55,6 +57,31 @@ grep -Fq '30..32  2:12..2:14  integer  `42`  value=42' \
     "$temporary_directory/stdout" || fail 'token dump lost the integer value'
 grep -Fq '36..36  4:1..4:1  eof' "$temporary_directory/stdout" || \
     fail 'token dump did not report the EOF position'
+
+expect_status 0 "$compiler" dump ast examples/return-42.study
+grep -Fq 'program  1:1..4:1' "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include the program range'
+grep -Fq '  function main -> i32  1:1..3:2' \
+    "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include the main function'
+grep -Fq '      return  2:5..2:15' "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include the return statement'
+grep -Fq '        integer 42  2:12..2:14' \
+    "$temporary_directory/stdout" || \
+    fail 'syntax dump did not preserve the integer expression'
+
+expect_status 0 "$compiler" dump ast examples/sum-to.study
+grep -Fq '  function sum_to -> i32' "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include sum_to'
+grep -Fq '      while' "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include the loop'
+grep -Fq '        call sum_to' "$temporary_directory/stdout" || \
+    fail 'syntax dump did not include the call'
+
+expect_status 1 "$compiler" dump ast examples/invalid/missing-semicolon.study
+grep -Fq 'examples/invalid/missing-semicolon.study:3:1: error: expected' \
+    "$temporary_directory/stderr" || \
+    fail 'parser did not locate the missing semicolon'
 
 missing_path="$temporary_directory/missing.study"
 expect_status 1 "$compiler" dump source "$missing_path"

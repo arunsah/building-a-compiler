@@ -9,7 +9,7 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: tokens and source ranges
+## Current checkpoint: parsing and syntax trees
 
 The driver can show both the source metadata and the token stream:
 
@@ -17,6 +17,7 @@ The driver can show both the source metadata and the token stream:
 make -C compiler
 ./compiler/build/studycc dump source compiler/examples/return-42.study
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
+./compiler/build/studycc dump ast compiler/examples/return-42.study
 ```
 
 Expected shape:
@@ -35,8 +36,14 @@ ASCII identifiers, decimal integers, spaces, tabs, common line endings, and
 `//` line comments. It rejects unsupported bytes and decimal integers above
 `2147483647` at their source location.
 
-No parsing, checking, or executable generation is implemented yet. A valid
-token stream does not claim that the tokens form a valid Study program.
+`dump ast` parses the complete first grammar: functions and parameters,
+blocks, variable declarations and assignments, conditions, loops, returns,
+printing, calls, grouping, unary expressions, and precedence-ordered binary
+expressions. The tree keeps source ranges on every node.
+
+Name resolution, type checking, and executable generation are not implemented
+yet. A syntax tree records the program's grammatical structure; it does not
+claim that names exist or that operations have valid types.
 
 ## Build and verify
 
@@ -49,12 +56,14 @@ The default build enables strict warnings and treats warnings as errors. The
 tests cover command usage, source ownership, empty input, paths containing
 spaces, CRLF and bare-CR line endings, comments, every current keyword and
 operator, longest operator matches, integer bounds, unsupported bytes, token
-array ownership, and source ranges.
+array ownership, source ranges, every current statement and expression shape,
+operator precedence and associativity, malformed grammar, and bounded syntax
+nesting.
 
 To retain a small environment and verification record in a new directory:
 
 ```sh
-./compiler/record-lexer-evidence.sh NEW_OUTPUT_DIRECTORY
+./compiler/record-parser-evidence.sh NEW_OUTPUT_DIRECTORY
 ```
 
 The recorder uses a temporary build directory, runs the strict and sanitizer
@@ -66,6 +75,9 @@ The earlier driver records remain under
 [`evidence/03-driver-source`](evidence/03-driver-source). The current macOS
 Arm64 and Debian Linux x86-64 records are under
 [`evidence/04-lexer`](evidence/04-lexer).
+
+The parser checkpoint will retain its own records under `evidence/05-parser`
+after review.
 
 ## Source ownership contract
 
@@ -108,6 +120,25 @@ Token positions use zero-based byte offsets and one-based lines and columns.
 Columns count source bytes rather than terminal display cells. CRLF consumes
 two bytes but advances the line only once. Every range has an exclusive end,
 and the EOF token has an empty range at the final source position.
+
+## Syntax-tree ownership contract
+
+`study_parse()` borrows the source and complete token list and writes into an
+initialized empty `StudySyntaxTree`. On success, the tree owns one dynamic node
+array. Its name fields are token indices rather than copied spellings, so both
+the token list and source must remain alive while the tree is used.
+
+Nodes refer to children by stable numeric indices. Each parent keeps the first
+and last child, and siblings form an ordered chain. The order carries roles:
+for example, an `if` node contains its condition, then block, and optional else
+block in that order. Every node also keeps the complete source range which
+formed it.
+
+The parser builds a temporary tree and publishes it only after reaching the
+EOF token. On the first grammar error it reports the current token, frees every
+temporary node, and leaves the caller's output empty. Recursive expression,
+call, and block nesting is bounded to 256 levels so malformed input cannot ask
+the C call stack to grow without limit.
 
 ## Exit status
 

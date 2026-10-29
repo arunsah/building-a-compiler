@@ -1,6 +1,8 @@
 #include "study/diagnostic.h"
 #include "study/lexer.h"
+#include "study/parser.h"
 #include "study/source.h"
+#include "study/syntax.h"
 #include "study/token.h"
 
 #include <inttypes.h>
@@ -19,6 +21,7 @@ static void study_print_usage(FILE *stream) {
         "Usage:\n"
         "  studycc dump source INPUT.study\n"
         "  studycc dump tokens INPUT.study\n"
+        "  studycc dump ast INPUT.study\n"
         "  studycc --help\n"
     );
 }
@@ -110,6 +113,40 @@ static int study_dump_tokens(const char *path) {
     return STUDY_EXIT_SUCCESS;
 }
 
+static int study_dump_ast(const char *path) {
+    StudySource source;
+    StudyTokenList tokens;
+    StudySyntaxTree tree;
+    StudyDiagnostic diagnostic;
+    int status = STUDY_EXIT_SUCCESS;
+
+    study_source_init(&source);
+    study_token_list_init(&tokens);
+    study_syntax_tree_init(&tree);
+    study_diagnostic_clear(&diagnostic);
+
+    if (!study_source_read(&source, path, &diagnostic) ||
+        !study_lex(&source, &tokens, &diagnostic) ||
+        !study_parse(&source, &tokens, &tree, &diagnostic)) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (!study_syntax_tree_dump(stdout, &tree, &source, &tokens)) {
+        study_diagnostic_set(
+            &diagnostic,
+            STUDY_DIAGNOSTIC_INTERNAL,
+            source.path,
+            "could not write syntax tree dump"
+        );
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    }
+
+    study_syntax_tree_free(&tree);
+    study_token_list_free(&tokens);
+    study_source_free(&source);
+    return status;
+}
+
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         study_print_usage(stdout);
@@ -124,6 +161,11 @@ int main(int argc, char **argv) {
     if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
         strcmp(argv[2], "tokens") == 0) {
         return study_dump_tokens(argv[3]);
+    }
+
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "ast") == 0) {
+        return study_dump_ast(argv[3]);
     }
 
     study_print_usage(stderr);

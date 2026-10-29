@@ -24,14 +24,16 @@ directory for every chapter.
 ## Current compiler checkpoint
 
 The compiler now establishes the `studycc` driver and owned source-byte
-boundary, then turns the source into tokens with exact byte, line, and column
-ranges. It does not parse or compile the token stream yet.
+boundary, turns the source into tokens with exact ranges, and parses the
+complete first grammar into a syntax tree. It does not resolve names, check
+types, or compile the tree yet.
 
 ```sh
 make -C compiler test
 make -C compiler sanitize
 ./compiler/build/studycc dump source compiler/examples/return-42.study
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
+./compiler/build/studycc dump ast compiler/examples/return-42.study
 ```
 
 See the [compiler README](compiler/README.md) for the ownership contract,

@@ -7,9 +7,11 @@ BASE_CFLAGS := -std=c17 -Wall -Wextra -Wpedantic -Wconversion -Wshadow \
 CFLAGS ?= $(BASE_CFLAGS)
 LDFLAGS ?=
 
-LIB_SOURCES := src/diagnostic.c src/source.c src/token.c src/lexer.c
+LIB_SOURCES := src/diagnostic.c src/source.c src/token.c src/lexer.c \
+	src/syntax.c src/parser.c
 HEADERS := include/study/diagnostic.h include/study/lexer.h \
-	include/study/location.h include/study/source.h include/study/token.h
+	include/study/location.h include/study/parser.h include/study/source.h \
+	include/study/syntax.h include/study/token.h
 
 .PHONY: all test sanitize clean
 
@@ -27,9 +29,14 @@ $(BUILD_DIR)/source-test: tests/source_test.c $(LIB_SOURCES) $(HEADERS) | $(BUIL
 $(BUILD_DIR)/lexer-test: tests/lexer_test.c $(LIB_SOURCES) $(HEADERS) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) tests/lexer_test.c $(LIB_SOURCES) -o $@
 
-test: $(BUILD_DIR)/studycc $(BUILD_DIR)/source-test $(BUILD_DIR)/lexer-test
+$(BUILD_DIR)/parser-test: tests/parser_test.c $(LIB_SOURCES) $(HEADERS) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) tests/parser_test.c $(LIB_SOURCES) -o $@
+
+test: $(BUILD_DIR)/studycc $(BUILD_DIR)/source-test $(BUILD_DIR)/lexer-test \
+		$(BUILD_DIR)/parser-test
 	"$(BUILD_DIR)/source-test"
 	"$(BUILD_DIR)/lexer-test"
+	"$(BUILD_DIR)/parser-test"
 	sh tests/driver_test.sh "$(BUILD_DIR)/studycc"
 
 sanitize:
