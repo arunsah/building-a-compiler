@@ -35,6 +35,10 @@ grep -Fq 'studycc dump tokens INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump tokens'
 grep -Fq 'studycc dump ast INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump ast'
+grep -Fq 'studycc dump checked INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump checked'
+grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe check'
 
 expect_status 2 "$compiler"
 grep -Fq 'Usage:' "$temporary_directory/stderr" || \
@@ -82,6 +86,25 @@ expect_status 1 "$compiler" dump ast examples/invalid/missing-semicolon.study
 grep -Fq 'examples/invalid/missing-semicolon.study:3:1: error: expected' \
     "$temporary_directory/stderr" || \
     fail 'parser did not locate the missing semicolon'
+
+expect_status 0 "$compiler" check examples/return-42.study
+test ! -s "$temporary_directory/stdout" || \
+    fail 'successful check wrote unexpected standard output'
+test ! -s "$temporary_directory/stderr" || \
+    fail 'successful check wrote unexpected standard error'
+
+expect_status 0 "$compiler" check examples/sum-to.study
+expect_status 0 "$compiler" dump checked examples/return-42.study
+grep -Fq 'function main -> i32  [decl=#0, returns=yes]' \
+    "$temporary_directory/stdout" || \
+    fail 'checked dump did not annotate main'
+grep -Fq 'integer 42  [type=i32]' "$temporary_directory/stdout" || \
+    fail 'checked dump did not annotate the integer type'
+
+expect_status 1 "$compiler" check examples/invalid/type-mismatch.study
+grep -Fq 'examples/invalid/type-mismatch.study:2:12: error: return value requires i32, found bool' \
+    "$temporary_directory/stderr" || \
+    fail 'checker did not locate the return type mismatch'
 
 missing_path="$temporary_directory/missing.study"
 expect_status 1 "$compiler" dump source "$missing_path"

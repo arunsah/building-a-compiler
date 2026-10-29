@@ -1,3 +1,5 @@
+#include "study/checked.h"
+#include "study/checker.h"
 #include "study/diagnostic.h"
 #include "study/lexer.h"
 #include "study/parser.h"
@@ -22,6 +24,8 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump source INPUT.study\n"
         "  studycc dump tokens INPUT.study\n"
         "  studycc dump ast INPUT.study\n"
+        "  studycc dump checked INPUT.study\n"
+        "  studycc check INPUT.study\n"
         "  studycc --help\n"
     );
 }
@@ -147,6 +151,57 @@ static int study_dump_ast(const char *path) {
     return status;
 }
 
+static int study_check_path(const char *path, bool dump_checked) {
+    StudySource source;
+    StudyTokenList tokens;
+    StudySyntaxTree tree;
+    StudyCheckedProgram checked;
+    StudyDiagnostic diagnostic;
+    int status = STUDY_EXIT_SUCCESS;
+
+    study_source_init(&source);
+    study_token_list_init(&tokens);
+    study_syntax_tree_init(&tree);
+    study_checked_program_init(&checked);
+    study_diagnostic_clear(&diagnostic);
+
+    if (!study_source_read(&source, path, &diagnostic) ||
+        !study_lex(&source, &tokens, &diagnostic) ||
+        !study_parse(&source, &tokens, &tree, &diagnostic) ||
+        !study_check_program(
+            &source,
+            &tokens,
+            &tree,
+            &checked,
+            &diagnostic
+        )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (dump_checked &&
+               !study_checked_program_dump(
+                   stdout,
+                   &checked,
+                   &tree,
+                   &source,
+                   &tokens
+               )) {
+        study_diagnostic_set(
+            &diagnostic,
+            STUDY_DIAGNOSTIC_INTERNAL,
+            source.path,
+            "could not write checked program dump"
+        );
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    }
+
+    study_checked_program_free(&checked);
+    study_syntax_tree_free(&tree);
+    study_token_list_free(&tokens);
+    study_source_free(&source);
+    return status;
+}
+
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         study_print_usage(stdout);
@@ -166,6 +221,15 @@ int main(int argc, char **argv) {
     if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
         strcmp(argv[2], "ast") == 0) {
         return study_dump_ast(argv[3]);
+    }
+
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "checked") == 0) {
+        return study_check_path(argv[3], true);
+    }
+
+    if (argc == 3 && strcmp(argv[1], "check") == 0) {
+        return study_check_path(argv[2], false);
     }
 
     study_print_usage(stderr);

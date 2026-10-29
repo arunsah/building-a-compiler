@@ -25,8 +25,9 @@ directory for every chapter.
 
 The compiler now establishes the `studycc` driver and owned source-byte
 boundary, turns the source into tokens with exact ranges, and parses the
-complete first grammar into a syntax tree. It does not resolve names, check
-types, or compile the tree yet.
+complete first grammar into a syntax tree. It now also resolves function and
+local names, checks expression types and calls, and verifies return paths. It
+does not lower the checked program to IR or compile it yet.
 
 ```sh
 make -C compiler test
@@ -34,6 +35,8 @@ make -C compiler sanitize
 ./compiler/build/studycc dump source compiler/examples/return-42.study
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
+./compiler/build/studycc dump checked compiler/examples/return-42.study
+./compiler/build/studycc check compiler/examples/return-42.study
 ```
 
 See the [compiler README](compiler/README.md) for the ownership contract,

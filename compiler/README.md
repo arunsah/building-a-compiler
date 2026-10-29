@@ -9,7 +9,7 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: parsing and syntax trees
+## Current checkpoint: names, scopes, and types
 
 The driver can show both the source metadata and the token stream:
 
@@ -18,6 +18,8 @@ make -C compiler
 ./compiler/build/studycc dump source compiler/examples/return-42.study
 ./compiler/build/studycc dump tokens compiler/examples/return-42.study
 ./compiler/build/studycc dump ast compiler/examples/return-42.study
+./compiler/build/studycc dump checked compiler/examples/return-42.study
+./compiler/build/studycc check compiler/examples/return-42.study
 ```
 
 Expected shape:
@@ -41,9 +43,13 @@ blocks, variable declarations and assignments, conditions, loops, returns,
 printing, calls, grouping, unary expressions, and precedence-ordered binary
 expressions. The tree keeps source ranges on every node.
 
-Name resolution, type checking, and executable generation are not implemented
-yet. A syntax tree records the program's grammatical structure; it does not
-claim that names exist or that operations have valid types.
+`check` collects every function signature before checking any body, resolves
+locals and parameters through lexical block scopes, annotates expressions with
+`i32` or `bool`, validates operators, assignments, calls, conditions, printing
+and return values, and conservatively checks that every function path returns.
+`dump checked` makes those types and declaration links visible beside the AST.
+
+Typed IR, interpretation, and executable generation are not implemented yet.
 
 ## Build and verify
 
@@ -58,12 +64,14 @@ spaces, CRLF and bare-CR line endings, comments, every current keyword and
 operator, longest operator matches, integer bounds, unsupported bytes, token
 array ownership, source ranges, every current statement and expression shape,
 operator precedence and associativity, malformed grammar, and bounded syntax
-nesting.
+nesting. Semantic tests additionally cover forward calls, block shadowing,
+same-scope duplicates, unknown names, every current type rule, function
+signatures and argument lists, and conservative return-path analysis.
 
 To retain a small environment and verification record in a new directory:
 
 ```sh
-./compiler/record-parser-evidence.sh NEW_OUTPUT_DIRECTORY
+./compiler/record-checker-evidence.sh NEW_OUTPUT_DIRECTORY
 ```
 
 The recorder uses a temporary build directory, runs the strict and sanitizer
@@ -78,6 +86,9 @@ Arm64 and Debian Linux x86-64 records are under
 
 The current parser records are under
 [`evidence/05-parser`](evidence/05-parser).
+
+The semantic-checker checkpoint will retain its own records under
+`evidence/06-checker` after review.
 
 ## Source ownership contract
 
@@ -139,6 +150,23 @@ EOF token. On the first grammar error it reports the current token, frees every
 temporary node, and leaves the caller's output empty. Recursive expression,
 call, and block nesting is bounded to 256 levels so malformed input cannot ask
 the C call stack to grow without limit.
+
+## Checked-program ownership contract
+
+`study_check_program()` borrows the source, token list, and syntax tree. On
+success, `StudyCheckedProgram` owns one annotation for every syntax node and a
+declaration array. An annotation may record an expression type, a resolved
+declaration ID, and whether a statement or block definitely returns.
+
+Names in declarations remain token indices, and declaration annotations refer
+to syntax-node IDs. The checked program therefore does not replace its inputs;
+it adds semantic facts while borrowing their spelling and structure. The
+driver releases the checked program before the syntax tree, tokens, and
+source.
+
+The checker builds temporary declaration and scope tables. It publishes the
+checked program only after every function body succeeds. A semantic error
+frees those arrays and leaves the caller's output empty.
 
 ## Exit status
 
