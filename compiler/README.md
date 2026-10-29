@@ -158,6 +158,9 @@ The current typed-IR and reference-interpreter records are under
 The first native system-tool path records are under
 [`evidence/08-system-tool-path`](evidence/08-system-tool-path).
 
+The x86-64 target-lowering and stack-layout records are under
+[`evidence/09-x86-target-ir`](evidence/09-x86-target-ir).
+
 ## Source ownership contract
 
 `study_source_read()` reads bytes through a stream instead of assuming a

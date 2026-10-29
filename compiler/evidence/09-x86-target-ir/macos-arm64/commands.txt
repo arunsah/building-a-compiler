@@ -1,0 +1,15 @@
+make BUILD_DIR=<temporary>/strict test
+make BUILD_DIR=<temporary>/sanitize \
+  CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
+  LDFLAGS='-fsanitize=address,undefined' test
+<temporary>/strict/studycc dump x86-64 examples/return-42.study
+<temporary>/strict/studycc dump x86-64 examples/sum-to.study
+<temporary>/strict/studycc dump x86-64 examples/operations.study
+<temporary>/strict/studycc emit asm examples/return-42.study
+<temporary>/strict/studycc emit asm examples/sum-to.study
+<temporary>/strict/studycc emit asm examples/operations.study
+<temporary>/strict/studycc interpret examples/sum-to.study
+<temporary>/strict/studycc interpret examples/operations.study
+<temporary>/strict/studycc build examples/return-42.study -o <temporary>/return-42
+<temporary>/strict/studycc build examples/sum-to.study -o <temporary>/sum-to
+<temporary>/strict/studycc build examples/operations.study -o <temporary>/operations

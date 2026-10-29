@@ -1,0 +1,5 @@
+strict-warning-tests=passed
+typed-ir-to-x86-lowering-tests=passed
+x86-target-verifier-tests=passed
+assembly-rendering-tests=passed
+system-tool-adapter-tests=passed

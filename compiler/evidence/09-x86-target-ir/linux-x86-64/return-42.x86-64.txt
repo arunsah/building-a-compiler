@@ -1,0 +1,91 @@
+target x86-64-linux-system-v {
+  function f0 _start [frame=0, entry=b0] {
+    b0:
+      call f2
+      mov.i32 eax, edi
+      mov.i32 #0x0000003c, eax
+      syscall
+      undefined
+  }
+  function f1 study_rt_print_i32 [frame=64, entry=b1] {
+    b1:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x40, rsp
+      xor.i32 r8d, r8d
+      mov.i32 edi, eax
+      test.i32 eax, eax
+      branch.not-sign b3, b2
+    b2:
+      mov.i32 #0x00000001, r8d
+      neg.i32 eax
+      jump b3
+    b3:
+      lea.i64 [rbp-1], rsi
+      mov.i8 #0xa, [rsi]
+      mov.i32 #0x00000001, r9d
+      test.i32 eax, eax
+      branch.not-equal b5, b4
+    b4:
+      dec.i64 rsi
+      mov.i8 #0x30, [rsi]
+      inc.i64 r9
+      jump b6
+    b5:
+      xor.i32 edx, edx
+      mov.i32 #0x0000000a, ecx
+      div.i32 ecx
+      add.i8 #0x30, dl
+      dec.i64 rsi
+      mov.i8 dl, [rsi]
+      inc.i64 r9
+      test.i32 eax, eax
+      branch.not-equal b5, b6
+    b6:
+      test.i32 r8d, r8d
+      branch.equal b8, b7
+    b7:
+      dec.i64 rsi
+      mov.i8 #0x2d, [rsi]
+      inc.i64 r9
+      jump b8
+    b8:
+      mov.i64 r9, rdx
+      jump b9
+    b9:
+      mov.i32 #0x00000001, eax
+      mov.i32 #0x00000001, edi
+      syscall
+      cmp.i64 #-4, rax
+      branch.equal b9, b10
+    b10:
+      test.i64 rax, rax
+      branch.less-equal b13, b11
+    b11:
+      add.i64 rax, rsi
+      sub.i64 rax, rdx
+      test.i64 rdx, rdx
+      branch.not-equal b9, b12
+    b12:
+      leave
+      return
+    b13:
+      mov.i32 #0x0000004a, edi
+      mov.i32 #0x0000003c, eax
+      syscall
+      undefined
+  }
+  function f2 study_fn_0 [frame=16, entry=b14] {
+    storage:
+      ir.v0 -> i32 [rbp-8]
+    b14:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x10, rsp
+      mov.i32 #0x0000002a, eax
+      mov.i32 eax, [rbp-8]
+      mov.i32 [rbp-8], eax
+      leave
+      return
+  }
+}
