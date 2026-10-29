@@ -1,7 +1,7 @@
 700a5247aa14edfd73f51adbdefaad6620cb139a887e3ab9122263b644a27a05  ./commands.txt
-c470d958e7edfc0bd4215cc4168647926d0dbb296640e21afab74ea6002a68c6  ./environment.txt
+0e022e4bfd149e733050008d6401b66a530b6157ce15f1cc8d4c4e78cced3b4d  ./environment.txt
 037df95dc4b9277babfb6002b0dd574cc21ad1b76ce2af26ca8d357bb993e133  ./native-results.txt
-12d787099edb5f64164d5209dfa5ddc252d7710aa702f186d655058880f5ac67  ./operations.assembly-reference-disassembly.txt
+b8651d2468ea1074894f1f0b8933aa446a2aa2ebe985dccc4512b0e29810908a  ./operations.assembly-reference-disassembly.txt
 ec42ec34b6412926be15e396937dd1c945b8fa6af4b8cc19a592d193afb6f79b  ./operations.bin
 dd6a09351262a9195841f3938a71ffbf2f2fde88bd4a6561694e7584fce86e54  ./operations.elf.txt
 ba1d90c600a75d65cdd2b016392a0e50cb7378dc21835666a68e5281d491e49d  ./operations.encoded-disassembly.txt
@@ -10,7 +10,7 @@ ec72c663f3369a0f3b1597a8d0bea609b0f7c8559f6863391897fba985574901  ./operations.e
 7e0288c7904a35bcfb53aac414a7926fe0c1f0c6de6e6c591a611ed2c46d6c8e  ./operations.native-output.txt
 c28514e3d45a0d7dfe1895dc3e034211fb86b29d84e86c0606b11839bada3fd2  ./operations.s
 5c36fac24b4a8d8c62d5cab33b2d8082fbfe8b0aae3a1fa793d27fe7dfb942ec  ./operations.x86-64.txt
-f8739253b8b2ebc8e113a9b2a38c6966ee48b78875e6492a6cda9f1f3b33aa69  ./return-42.assembly-reference-disassembly.txt
+ebd460d3bfd1ae1efd8d1fb405a10d214a65deca69ddc28bf341cfd227934146  ./return-42.assembly-reference-disassembly.txt
 4c6f067bb349ef8935d84aa0cbacea46c561d73615f90c919733cdeb7805298a  ./return-42.bin
 331d613f6270dc0d987a98d9635ce7d17cc13c6aadf0bd5546d086c402387c86  ./return-42.elf.txt
 ddf5af8ea6ecdbf7c40fa31298c4fa9cad95be662154ed689cc60ec08b7f3ff4  ./return-42.encoded-disassembly.txt
@@ -19,7 +19,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./return-42.na
 aa23798239cbfeca6b26b0d6fa04cfd2ef980be2a47af5065aa2739bd5969ea9  ./return-42.s
 0fb424908c6e96f0a87f3357cd2c73beef1784fbcad90955f320090094bc416d  ./return-42.x86-64.txt
 fab29f5bb4479230b7736e87ea74b45e90f41d31328e3452b04d30d74de5c69d  ./sanitizers.txt
-bdf6904c08480d1a46e044675c15e5c1551ec00007230930bf6f11230030ea6e  ./sum-to.assembly-reference-disassembly.txt
+f94c4908a7ca63da62bfeef756cb92a92e0632cd39bc0e2e6d7ab3f170f25a2f  ./sum-to.assembly-reference-disassembly.txt
 869628d2810a6ed0fc21ac7e8349523189e37d4636e4984190d746640594ba16  ./sum-to.bin
 1a5a06335d32927985e4b435adb76bdd4b8a4593ce47f4a962be8a88f1d05395  ./sum-to.elf.txt
 1bc0e4df89d5f407f80d58530cc9302a5fac2a1ee21e8c921467ebf33f6f18f0  ./sum-to.encoded-disassembly.txt

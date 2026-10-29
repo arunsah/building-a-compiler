@@ -2,7 +2,7 @@
 
 These records were generated on 29 October 2026 by
 `compiler/record-x86-encoder-evidence.sh` from source revision
-`231c7812af23760b23209f97d221c73f0d8e1097`.
+`73d9a0da893d789a5149bdb018872a1a4dc6badc`.
 
 | Record | What it establishes |
 | --- | --- |
@@ -39,6 +39,11 @@ identical to the corresponding flat image, proving that the temporary object
 wrapper and linker did not rewrite our instructions. The retained ELF reports
 also show an ELF64 x86-64 static executable whose entry address names `_start`
 and which has no dynamic interpreter.
+
+The Linux command suite also constructs a restricted `PATH` containing GNU
+`objcopy` and `ld` but no assembler. The default `build` command still produces
+and runs `return-42` successfully in that environment. The separately named
+`build via-asm` command remains the only path which requires GNU `as`.
 
 This evidence does not claim that the compiler already writes an ELF object or
 links one. GNU `objcopy` still gives the flat image an ELF `.text` section and

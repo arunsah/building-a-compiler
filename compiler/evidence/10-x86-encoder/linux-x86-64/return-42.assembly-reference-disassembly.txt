@@ -1,5 +1,5 @@
 
-/tmp/study-encoder-record.ncJatP/return-42.via-asm:     file format elf64-x86-64
+/tmp/study-encoder-record.y0LtW3/return-42.via-asm:     file format elf64-x86-64
 
 
 Disassembly of section .text:
