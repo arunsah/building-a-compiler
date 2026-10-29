@@ -10,9 +10,9 @@ These records were generated on 29 October 2026 by
 | `linux-x86-64/` | The same committed source passes those checks using GCC on Debian Linux x86-64. |
 
 Each directory contains the recorded environment, normalized commands, pass
-markers, the complete IR dump for `return-42.study`, the output from
-interpreting `sum-to.study`, and checksums. The IR dump and program output are
-identical across the two hosts.
+markers, complete IR dumps for `return-42.study` and `sum-to.study`, the output
+from interpreting `sum-to.study`, and checksums. The IR dumps and program
+output are identical across the two hosts.
 
 These records establish the current lowering rules, typed values and slots,
 explicit control flow, verifier boundary, and reference execution semantics

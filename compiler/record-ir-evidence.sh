@@ -44,6 +44,7 @@ make BUILD_DIR=<temporary>/sanitize \
   CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
   LDFLAGS='-fsanitize=address,undefined' test
 <temporary>/strict/studycc dump ir examples/return-42.study
+<temporary>/strict/studycc dump ir examples/sum-to.study
 <temporary>/strict/studycc interpret examples/sum-to.study
 EOF
 
@@ -77,6 +78,12 @@ printf 'address-and-undefined-sanitizers=passed\n' \
 (
     cd "$script_directory"
     "$temporary_directory/strict/studycc" \
+        dump ir examples/sum-to.study
+) >"$output_directory/sum-to.ir.txt"
+
+(
+    cd "$script_directory"
+    "$temporary_directory/strict/studycc" \
         interpret examples/sum-to.study
 ) >"$output_directory/sum-to.output.txt"
 
@@ -89,13 +96,13 @@ if command -v sha256sum >/dev/null 2>&1; then
     (
         cd "$output_directory"
         sha256sum commands.txt environment.txt return-42.ir.txt \
-            sanitizers.txt sum-to.output.txt tests.txt
+            sanitizers.txt sum-to.ir.txt sum-to.output.txt tests.txt
     ) >"$output_directory/SHA256SUMS"
 else
     (
         cd "$output_directory"
         shasum -a 256 commands.txt environment.txt return-42.ir.txt \
-            sanitizers.txt sum-to.output.txt tests.txt
+            sanitizers.txt sum-to.ir.txt sum-to.output.txt tests.txt
     ) >"$output_directory/SHA256SUMS"
 fi
 
