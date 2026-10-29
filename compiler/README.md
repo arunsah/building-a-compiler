@@ -63,9 +63,9 @@ tests, saves one sample observation, and writes checksums. Review
 private hostname, account identifier, credential, or token.
 
 The earlier driver records remain under
-[`evidence/03-driver-source`](evidence/03-driver-source). The lexer checkpoint
-will retain its own macOS Arm64 and Debian Linux x86-64 records under
-`evidence/04-lexer` after review.
+[`evidence/03-driver-source`](evidence/03-driver-source). The current macOS
+Arm64 and Debian Linux x86-64 records are under
+[`evidence/04-lexer`](evidence/04-lexer).
 
 ## Source ownership contract
 

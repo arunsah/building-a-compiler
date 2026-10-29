@@ -1,0 +1,2 @@
+exit-status=1
+examples/invalid/integer-too-large.study:1:1: error: integer literal exceeds 2147483647
