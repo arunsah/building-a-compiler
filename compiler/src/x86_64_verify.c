@@ -41,6 +41,8 @@ static bool study_x86_64_condition_is_valid(StudyX86Condition condition) {
 }
 
 static bool study_x86_64_operand_is_valid(const StudyX86Operand *operand) {
+    int64_t signed_value;
+
     if (operand->kind == STUDY_X86_OPERAND_NONE) {
         return true;
     }
@@ -52,13 +54,17 @@ static bool study_x86_64_operand_is_valid(const StudyX86Operand *operand) {
         case STUDY_X86_OPERAND_REGISTER:
             return study_x86_64_register_is_valid(operand->as.register_id);
         case STUDY_X86_OPERAND_IMMEDIATE:
+            signed_value = (int64_t)operand->as.immediate.value;
             if (operand->width == STUDY_X86_WIDTH_8) {
-                return operand->as.immediate.is_signed ||
-                       operand->as.immediate.value <= UINT8_MAX;
+                return operand->as.immediate.is_signed
+                           ? signed_value >= INT8_MIN && signed_value <= INT8_MAX
+                           : operand->as.immediate.value <= UINT8_MAX;
             }
             if (operand->width == STUDY_X86_WIDTH_32) {
-                return operand->as.immediate.is_signed ||
-                       operand->as.immediate.value <= UINT32_MAX;
+                return operand->as.immediate.is_signed
+                           ? signed_value >= INT32_MIN &&
+                                 signed_value <= INT32_MAX
+                           : operand->as.immediate.value <= UINT32_MAX;
             }
             return true;
         case STUDY_X86_OPERAND_MEMORY:
@@ -68,6 +74,17 @@ static bool study_x86_64_operand_is_valid(const StudyX86Operand *operand) {
     }
 
     return false;
+}
+
+static bool study_x86_64_immediate_fits_sign_extended_i32(
+    const StudyX86Operand *operand
+) {
+    int64_t signed_value = (int64_t)operand->as.immediate.value;
+
+    return operand->kind == STUDY_X86_OPERAND_IMMEDIATE &&
+           (operand->as.immediate.is_signed
+                ? signed_value >= INT32_MIN && signed_value <= INT32_MAX
+                : operand->as.immediate.value <= (uint64_t)INT32_MAX);
 }
 
 static bool study_x86_64_operand_is_data(
@@ -119,7 +136,14 @@ static bool study_x86_64_instruction_shape_is_valid(
 
     switch (instruction->opcode) {
         case STUDY_X86_MOV:
-            return study_x86_64_binary_operands_are_valid(instruction, true);
+            return study_x86_64_binary_operands_are_valid(instruction, true) &&
+                   !(instruction->first.kind ==
+                         STUDY_X86_OPERAND_IMMEDIATE &&
+                     instruction->second.kind == STUDY_X86_OPERAND_MEMORY &&
+                     instruction->second.width == STUDY_X86_WIDTH_64 &&
+                     !study_x86_64_immediate_fits_sign_extended_i32(
+                         &instruction->first
+                     ));
         case STUDY_X86_MOVZX:
             return study_x86_64_operand_is_data(&instruction->first) &&
                    instruction->first.width == STUDY_X86_WIDTH_8 &&
@@ -134,7 +158,13 @@ static bool study_x86_64_instruction_shape_is_valid(
         case STUDY_X86_SUBTRACT:
         case STUDY_X86_XOR:
         case STUDY_X86_COMPARE:
-            return study_x86_64_binary_operands_are_valid(instruction, true);
+            return study_x86_64_binary_operands_are_valid(instruction, true) &&
+                   !(instruction->first.kind ==
+                         STUDY_X86_OPERAND_IMMEDIATE &&
+                     instruction->second.width == STUDY_X86_WIDTH_64 &&
+                     !study_x86_64_immediate_fits_sign_extended_i32(
+                         &instruction->first
+                     ));
         case STUDY_X86_MULTIPLY:
             return study_x86_64_operand_is_data(&instruction->first) &&
                    instruction->second.kind == STUDY_X86_OPERAND_REGISTER &&

@@ -490,6 +490,36 @@ static void test_x86_verifier_rejects_storage_outside_frame(void) {
     ir_fixture_free(&fixture);
 }
 
+static void test_x86_verifier_rejects_unencodable_immediate(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyDiagnostic diagnostic;
+    size_t index;
+    bool changed = false;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    lower_x86_fixture(&fixture, &x86);
+    for (index = 0U; index < x86.instruction_count; index++) {
+        StudyX86Instruction *instruction = &x86.instructions[index];
+
+        if (instruction->opcode == STUDY_X86_COMPARE &&
+            instruction->first.kind == STUDY_X86_OPERAND_IMMEDIATE &&
+            instruction->first.width == STUDY_X86_WIDTH_64) {
+            instruction->first.as.immediate.value = UINT64_C(0x80000000);
+            instruction->first.as.immediate.is_signed = false;
+            changed = true;
+            break;
+        }
+    }
+    assert(changed);
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_x86_64_verify(&x86, &fixture.source, &diagnostic));
+    assert(strstr(diagnostic.message, "invalid operands") != NULL);
+
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
 static void test_x86_lowering_rejects_nonempty_output(void) {
     IrFixture fixture;
     StudyX86Program x86;
@@ -798,6 +828,7 @@ int main(void) {
     test_x86_encoder_rejects_nonempty_output();
     test_x86_verifier_rejects_cross_function_branch();
     test_x86_verifier_rejects_storage_outside_frame();
+    test_x86_verifier_rejects_unencodable_immediate();
     test_x86_lowering_rejects_nonempty_output();
     test_loop_call_print_and_result();
     test_loop_call_and_print_assembly();

@@ -233,6 +233,8 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     sum_executable="$temporary_directory/sum-to"
     operations_executable="$temporary_directory/operations"
     sum_via_assembly="$temporary_directory/sum-to-via-assembly"
+    no_assembler_executable="$temporary_directory/return-42-no-assembler"
+    adapter_directory="$temporary_directory/encoded-path-tools"
     preserved_output="$temporary_directory/preserved-output"
 
     printf 'keep this output\n' >"$preserved_output"
@@ -248,6 +250,13 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
         fail 'missing binary-object adapter was not reported'
     test "$(cat "$preserved_output")" = 'keep this output' || \
         fail 'binary-object adapter failure changed the earlier output'
+
+    mkdir "$adapter_directory"
+    ln -s "$(command -v objcopy)" "$adapter_directory/objcopy"
+    ln -s "$(command -v ld)" "$adapter_directory/ld"
+    expect_status 0 env PATH="$adapter_directory" "$compiler" build \
+        examples/return-42.study -o "$no_assembler_executable"
+    expect_status 42 "$no_assembler_executable"
 
     expect_status 1 env PATH=/nonexistent "$compiler" build via-asm \
         examples/return-42.study -o "$preserved_output"
