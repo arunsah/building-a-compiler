@@ -1,0 +1,6 @@
+strict-warning-tests=passed
+x86-target-verifier-tests=passed
+instruction-encoding-tests=passed
+relative-fixup-tests=passed
+binary-emission-tests=passed
+system-adapter-tests=passed

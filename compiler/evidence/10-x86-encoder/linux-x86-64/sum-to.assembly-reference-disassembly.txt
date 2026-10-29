@@ -1,0 +1,152 @@
+
+/tmp/study-encoder-record.ncJatP/sum-to.via-asm:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	e8 5b 01 00 00       	call   401160 <study_fn_1>
+  401005:	89 c7                	mov    edi,eax
+  401007:	b8 3c 00 00 00       	mov    eax,0x3c
+  40100c:	0f 05                	syscall
+  40100e:	0f 0b                	ud2
+
+0000000000401010 <study_rt_print_i32>:
+  401010:	55                   	push   rbp
+  401011:	48 89 e5             	mov    rbp,rsp
+  401014:	48 83 ec 40          	sub    rsp,0x40
+  401018:	45 31 c0             	xor    r8d,r8d
+  40101b:	89 f8                	mov    eax,edi
+  40101d:	85 c0                	test   eax,eax
+  40101f:	79 0c                	jns    40102d <study_rt_print_i32+0x1d>
+  401021:	eb 00                	jmp    401023 <study_rt_print_i32+0x13>
+  401023:	41 b8 01 00 00 00    	mov    r8d,0x1
+  401029:	f7 d8                	neg    eax
+  40102b:	eb 00                	jmp    40102d <study_rt_print_i32+0x1d>
+  40102d:	48 8d 75 ff          	lea    rsi,[rbp-0x1]
+  401031:	c6 06 0a             	mov    BYTE PTR [rsi],0xa
+  401034:	41 b9 01 00 00 00    	mov    r9d,0x1
+  40103a:	85 c0                	test   eax,eax
+  40103c:	75 0d                	jne    40104b <study_rt_print_i32+0x3b>
+  40103e:	eb 00                	jmp    401040 <study_rt_print_i32+0x30>
+  401040:	48 ff ce             	dec    rsi
+  401043:	c6 06 30             	mov    BYTE PTR [rsi],0x30
+  401046:	49 ff c1             	inc    r9
+  401049:	eb 1a                	jmp    401065 <study_rt_print_i32+0x55>
+  40104b:	31 d2                	xor    edx,edx
+  40104d:	b9 0a 00 00 00       	mov    ecx,0xa
+  401052:	f7 f1                	div    ecx
+  401054:	80 c2 30             	add    dl,0x30
+  401057:	48 ff ce             	dec    rsi
+  40105a:	88 16                	mov    BYTE PTR [rsi],dl
+  40105c:	49 ff c1             	inc    r9
+  40105f:	85 c0                	test   eax,eax
+  401061:	75 e8                	jne    40104b <study_rt_print_i32+0x3b>
+  401063:	eb 00                	jmp    401065 <study_rt_print_i32+0x55>
+  401065:	45 85 c0             	test   r8d,r8d
+  401068:	74 0d                	je     401077 <study_rt_print_i32+0x67>
+  40106a:	eb 00                	jmp    40106c <study_rt_print_i32+0x5c>
+  40106c:	48 ff ce             	dec    rsi
+  40106f:	c6 06 2d             	mov    BYTE PTR [rsi],0x2d
+  401072:	49 ff c1             	inc    r9
+  401075:	eb 00                	jmp    401077 <study_rt_print_i32+0x67>
+  401077:	4c 89 ca             	mov    rdx,r9
+  40107a:	eb 00                	jmp    40107c <study_rt_print_i32+0x6c>
+  40107c:	b8 01 00 00 00       	mov    eax,0x1
+  401081:	bf 01 00 00 00       	mov    edi,0x1
+  401086:	0f 05                	syscall
+  401088:	48 83 f8 fc          	cmp    rax,0xfffffffffffffffc
+  40108c:	74 ee                	je     40107c <study_rt_print_i32+0x6c>
+  40108e:	eb 00                	jmp    401090 <study_rt_print_i32+0x80>
+  401090:	48 85 c0             	test   rax,rax
+  401093:	7e 11                	jle    4010a6 <study_rt_print_i32+0x96>
+  401095:	eb 00                	jmp    401097 <study_rt_print_i32+0x87>
+  401097:	48 01 c6             	add    rsi,rax
+  40109a:	48 29 c2             	sub    rdx,rax
+  40109d:	48 85 d2             	test   rdx,rdx
+  4010a0:	75 da                	jne    40107c <study_rt_print_i32+0x6c>
+  4010a2:	eb 00                	jmp    4010a4 <study_rt_print_i32+0x94>
+  4010a4:	c9                   	leave
+  4010a5:	c3                   	ret
+  4010a6:	bf 4a 00 00 00       	mov    edi,0x4a
+  4010ab:	b8 3c 00 00 00       	mov    eax,0x3c
+  4010b0:	0f 05                	syscall
+  4010b2:	0f 0b                	ud2
+  4010b4:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
+  4010bb:	00 00 00 00 
+  4010bf:	90                   	nop
+
+00000000004010c0 <study_fn_0>:
+  4010c0:	55                   	push   rbp
+  4010c1:	48 89 e5             	mov    rbp,rsp
+  4010c4:	48 81 ec 80 00 00 00 	sub    rsp,0x80
+  4010cb:	89 7d f8             	mov    DWORD PTR [rbp-0x8],edi
+  4010ce:	b8 01 00 00 00       	mov    eax,0x1
+  4010d3:	89 45 e0             	mov    DWORD PTR [rbp-0x20],eax
+  4010d6:	8b 45 e0             	mov    eax,DWORD PTR [rbp-0x20]
+  4010d9:	89 45 f0             	mov    DWORD PTR [rbp-0x10],eax
+  4010dc:	b8 00 00 00 00       	mov    eax,0x0
+  4010e1:	89 45 d8             	mov    DWORD PTR [rbp-0x28],eax
+  4010e4:	8b 45 d8             	mov    eax,DWORD PTR [rbp-0x28]
+  4010e7:	89 45 e8             	mov    DWORD PTR [rbp-0x18],eax
+  4010ea:	eb 00                	jmp    4010ec <study_fn_0+0x2c>
+  4010ec:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  4010ef:	89 45 d0             	mov    DWORD PTR [rbp-0x30],eax
+  4010f2:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  4010f5:	89 45 c8             	mov    DWORD PTR [rbp-0x38],eax
+  4010f8:	8b 45 d0             	mov    eax,DWORD PTR [rbp-0x30]
+  4010fb:	3b 45 c8             	cmp    eax,DWORD PTR [rbp-0x38]
+  4010fe:	0f 9e c0             	setle  al
+  401101:	0f b6 c0             	movzx  eax,al
+  401104:	89 45 c0             	mov    DWORD PTR [rbp-0x40],eax
+  401107:	83 7d c0 00          	cmp    DWORD PTR [rbp-0x40],0x0
+  40110b:	75 02                	jne    40110f <study_fn_0+0x4f>
+  40110d:	eb 3a                	jmp    401149 <study_fn_0+0x89>
+  40110f:	8b 45 e8             	mov    eax,DWORD PTR [rbp-0x18]
+  401112:	89 45 b8             	mov    DWORD PTR [rbp-0x48],eax
+  401115:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  401118:	89 45 b0             	mov    DWORD PTR [rbp-0x50],eax
+  40111b:	8b 45 b8             	mov    eax,DWORD PTR [rbp-0x48]
+  40111e:	03 45 b0             	add    eax,DWORD PTR [rbp-0x50]
+  401121:	89 45 a8             	mov    DWORD PTR [rbp-0x58],eax
+  401124:	8b 45 a8             	mov    eax,DWORD PTR [rbp-0x58]
+  401127:	89 45 e8             	mov    DWORD PTR [rbp-0x18],eax
+  40112a:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  40112d:	89 45 a0             	mov    DWORD PTR [rbp-0x60],eax
+  401130:	b8 01 00 00 00       	mov    eax,0x1
+  401135:	89 45 98             	mov    DWORD PTR [rbp-0x68],eax
+  401138:	8b 45 a0             	mov    eax,DWORD PTR [rbp-0x60]
+  40113b:	03 45 98             	add    eax,DWORD PTR [rbp-0x68]
+  40113e:	89 45 90             	mov    DWORD PTR [rbp-0x70],eax
+  401141:	8b 45 90             	mov    eax,DWORD PTR [rbp-0x70]
+  401144:	89 45 f0             	mov    DWORD PTR [rbp-0x10],eax
+  401147:	eb a3                	jmp    4010ec <study_fn_0+0x2c>
+  401149:	8b 45 e8             	mov    eax,DWORD PTR [rbp-0x18]
+  40114c:	89 45 88             	mov    DWORD PTR [rbp-0x78],eax
+  40114f:	8b 45 88             	mov    eax,DWORD PTR [rbp-0x78]
+  401152:	c9                   	leave
+  401153:	c3                   	ret
+  401154:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
+  40115b:	00 00 00 00 
+  40115f:	90                   	nop
+
+0000000000401160 <study_fn_1>:
+  401160:	55                   	push   rbp
+  401161:	48 89 e5             	mov    rbp,rsp
+  401164:	48 83 ec 30          	sub    rsp,0x30
+  401168:	b8 0a 00 00 00       	mov    eax,0xa
+  40116d:	89 45 f0             	mov    DWORD PTR [rbp-0x10],eax
+  401170:	8b 7d f0             	mov    edi,DWORD PTR [rbp-0x10]
+  401173:	e8 48 ff ff ff       	call   4010c0 <study_fn_0>
+  401178:	89 45 e8             	mov    DWORD PTR [rbp-0x18],eax
+  40117b:	8b 45 e8             	mov    eax,DWORD PTR [rbp-0x18]
+  40117e:	89 45 f8             	mov    DWORD PTR [rbp-0x8],eax
+  401181:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  401184:	89 45 e0             	mov    DWORD PTR [rbp-0x20],eax
+  401187:	8b 7d e0             	mov    edi,DWORD PTR [rbp-0x20]
+  40118a:	e8 81 fe ff ff       	call   401010 <study_rt_print_i32>
+  40118f:	b8 00 00 00 00       	mov    eax,0x0
+  401194:	89 45 d8             	mov    DWORD PTR [rbp-0x28],eax
+  401197:	8b 45 d8             	mov    eax,DWORD PTR [rbp-0x28]
+  40119a:	c9                   	leave
+  40119b:	c3                   	ret

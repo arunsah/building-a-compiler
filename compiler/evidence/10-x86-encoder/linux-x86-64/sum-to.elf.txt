@@ -1,0 +1,62 @@
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x401000
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          4848 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         2
+  Size of section headers:           64 (bytes)
+  Number of section headers:         5
+  Section header string table index: 4
+
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .text             PROGBITS         0000000000401000  00001000
+       00000000000001ef  0000000000000000  AX       0     0     1
+  [ 2] .symtab           SYMTAB           0000000000000000  000011f0
+       00000000000000a8  0000000000000018           3     1     8
+  [ 3] .strtab           STRTAB           0000000000000000  00001298
+       0000000000000037  0000000000000000           0     0     1
+  [ 4] .shstrtab         STRTAB           0000000000000000  000012cf
+       0000000000000021  0000000000000000           0     0     1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  D (mbind), l (large), p (processor specific)
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000000000b0 0x00000000000000b0  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                 0x00000000000001ef 0x00000000000001ef  R E    0x1000
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .text 
+
+Symbol table '.symtab' contains 7 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000000001ef     0 NOTYPE  GLOBAL DEFAULT  ABS _study_image_size
+     2: 0000000000401000     0 NOTYPE  GLOBAL DEFAULT    1 _start
+     3: 0000000000402000     0 NOTYPE  GLOBAL DEFAULT    1 __bss_start
+     4: 0000000000402000     0 NOTYPE  GLOBAL DEFAULT    1 _edata
+     5: 0000000000402000     0 NOTYPE  GLOBAL DEFAULT    1 _end
+     6: 00000000004011ef     0 NOTYPE  GLOBAL DEFAULT    1 _study_image_end

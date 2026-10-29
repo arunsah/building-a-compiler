@@ -1,0 +1,19 @@
+make BUILD_DIR=<temporary>/strict test
+make BUILD_DIR=<temporary>/sanitize \
+  CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
+  LDFLAGS='-fsanitize=address,undefined' test
+<temporary>/strict/studycc dump encoding examples/return-42.study
+<temporary>/strict/studycc emit bin examples/return-42.study > return-42.bin
+<temporary>/strict/studycc emit asm examples/return-42.study > return-42.s
+<temporary>/strict/studycc dump encoding examples/sum-to.study
+<temporary>/strict/studycc emit bin examples/sum-to.study > sum-to.bin
+<temporary>/strict/studycc emit asm examples/sum-to.study > sum-to.s
+<temporary>/strict/studycc dump encoding examples/operations.study
+<temporary>/strict/studycc emit bin examples/operations.study > operations.bin
+<temporary>/strict/studycc emit asm examples/operations.study > operations.s
+<temporary>/strict/studycc interpret examples/sum-to.study
+<temporary>/strict/studycc interpret examples/operations.study
+<temporary>/strict/studycc build examples/PROGRAM.study -o <temporary>/PROGRAM.encoded
+<temporary>/strict/studycc build via-asm examples/PROGRAM.study -o <temporary>/PROGRAM.via-asm
+objdump -D -b binary -m i386:x86-64 -Mintel PROGRAM.bin
+readelf -h -l -S -s PROGRAM.encoded

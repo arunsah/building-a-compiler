@@ -1,0 +1,150 @@
+image x86-64-linux-system-v [bytes=495, entry=0x00000000] {
+  function f0 _start @0x00000000
+    b0 @0x00000000
+      00000000: e8 ab 01 00 00                      i0 call f3
+      00000005: 89 c7                               i1 mov
+      00000007: b8 3c 00 00 00                      i2 mov
+      0000000c: 0f 05                               i3 syscall
+      0000000e: 0f 0b                               i4 undefined
+  function f1 study_rt_print_i32 @0x00000010
+    b1 @0x00000010
+      00000010: 55                                  i5 push
+      00000011: 48 89 e5                            i6 mov
+      00000014: 48 81 ec 40 00 00 00                i7 sub
+      0000001b: 45 31 c0                            i8 xor
+      0000001e: 89 f8                               i9 mov
+      00000020: 85 c0                               i10 test
+      00000022: 0f 89 12 00 00 00 e9 00 00 00 00    i11 branch b3, b2
+    b2 @0x0000002d
+      0000002d: 41 b8 01 00 00 00                   i12 mov
+      00000033: f7 d8                               i13 neg
+      00000035: e9 00 00 00 00                      i14 jump b3
+    b3 @0x0000003a
+      0000003a: 48 8d 75 ff                         i15 lea
+      0000003e: 40 c6 06 0a                         i16 mov
+      00000042: 41 b9 01 00 00 00                   i17 mov
+      00000048: 85 c0                               i18 test
+      0000004a: 0f 85 14 00 00 00 e9 00 00 00 00    i19 branch b5, b4
+    b4 @0x00000055
+      00000055: 48 ff ce                            i20 dec
+      00000058: 40 c6 06 30                         i21 mov
+      0000005c: 49 ff c1                            i22 inc
+      0000005f: e9 23 00 00 00                      i23 jump b6
+    b5 @0x00000064
+      00000064: 31 d2                               i24 xor
+      00000066: b9 0a 00 00 00                      i25 mov
+      0000006b: f7 f1                               i26 div
+      0000006d: 40 80 c2 30                         i27 add
+      00000071: 48 ff ce                            i28 dec
+      00000074: 40 88 16                            i29 mov
+      00000077: 49 ff c1                            i30 inc
+      0000007a: 85 c0                               i31 test
+      0000007c: 0f 85 e2 ff ff ff e9 00 00 00 00    i32 branch b5, b6
+    b6 @0x00000087
+      00000087: 45 85 c0                            i33 test
+      0000008a: 0f 84 14 00 00 00 e9 00 00 00 00    i34 branch b8, b7
+    b7 @0x00000095
+      00000095: 48 ff ce                            i35 dec
+      00000098: 40 c6 06 2d                         i36 mov
+      0000009c: 49 ff c1                            i37 inc
+      0000009f: e9 00 00 00 00                      i38 jump b8
+    b8 @0x000000a4
+      000000a4: 4c 89 ca                            i39 mov
+      000000a7: e9 00 00 00 00                      i40 jump b9
+    b9 @0x000000ac
+      000000ac: b8 01 00 00 00                      i41 mov
+      000000b1: bf 01 00 00 00                      i42 mov
+      000000b6: 0f 05                               i43 syscall
+      000000b8: 48 81 f8 fc ff ff ff                i44 cmp
+      000000bf: 0f 84 e7 ff ff ff e9 00 00 00 00    i45 branch b9, b10
+    b10 @0x000000ca
+      000000ca: 48 85 c0                            i46 test
+      000000cd: 0f 8e 1b 00 00 00 e9 00 00 00 00    i47 branch b13, b11
+    b11 @0x000000d8
+      000000d8: 48 01 c6                            i48 add
+      000000db: 48 29 c2                            i49 sub
+      000000de: 48 85 d2                            i50 test
+      000000e1: 0f 85 c5 ff ff ff e9 00 00 00 00    i51 branch b9, b12
+    b12 @0x000000ec
+      000000ec: c9                                  i52 leave
+      000000ed: c3                                  i53 return
+    b13 @0x000000ee
+      000000ee: bf 4a 00 00 00                      i54 mov
+      000000f3: b8 3c 00 00 00                      i55 mov
+      000000f8: 0f 05                               i56 syscall
+      000000fa: 0f 0b                               i57 undefined
+  function f2 study_fn_0 @0x00000100
+    b14 @0x00000100
+      00000100: 55                                  i58 push
+      00000101: 48 89 e5                            i59 mov
+      00000104: 48 81 ec 80 00 00 00                i60 sub
+      0000010b: 89 7d f8                            i61 mov
+      0000010e: b8 01 00 00 00                      i62 mov
+      00000113: 89 45 e0                            i63 mov
+      00000116: 8b 45 e0                            i64 mov
+      00000119: 89 45 f0                            i65 mov
+      0000011c: b8 00 00 00 00                      i66 mov
+      00000121: 89 45 d8                            i67 mov
+      00000124: 8b 45 d8                            i68 mov
+      00000127: 89 45 e8                            i69 mov
+      0000012a: e9 00 00 00 00                      i70 jump b15
+    b15 @0x0000012f
+      0000012f: 8b 45 f0                            i71 mov
+      00000132: 89 45 d0                            i72 mov
+      00000135: 8b 45 f8                            i73 mov
+      00000138: 89 45 c8                            i74 mov
+      0000013b: 8b 45 d0                            i75 mov
+      0000013e: 3b 45 c8                            i76 cmp
+      00000141: 40 0f 9e c0                         i77 set
+      00000145: 40 0f b6 c0                         i78 movzx
+      00000149: 89 45 c0                            i79 mov
+      0000014c: 81 7d c0 00 00 00 00                i80 cmp
+      00000153: 0f 85 05 00 00 00 e9 3d 00 00 00    i81 branch b16, b17
+    b16 @0x0000015e
+      0000015e: 8b 45 e8                            i82 mov
+      00000161: 89 45 b8                            i83 mov
+      00000164: 8b 45 f0                            i84 mov
+      00000167: 89 45 b0                            i85 mov
+      0000016a: 8b 45 b8                            i86 mov
+      0000016d: 03 45 b0                            i87 add
+      00000170: 89 45 a8                            i88 mov
+      00000173: 8b 45 a8                            i89 mov
+      00000176: 89 45 e8                            i90 mov
+      00000179: 8b 45 f0                            i91 mov
+      0000017c: 89 45 a0                            i92 mov
+      0000017f: b8 01 00 00 00                      i93 mov
+      00000184: 89 45 98                            i94 mov
+      00000187: 8b 45 a0                            i95 mov
+      0000018a: 03 45 98                            i96 add
+      0000018d: 89 45 90                            i97 mov
+      00000190: 8b 45 90                            i98 mov
+      00000193: 89 45 f0                            i99 mov
+      00000196: e9 94 ff ff ff                      i100 jump b15
+    b17 @0x0000019b
+      0000019b: 8b 45 e8                            i101 mov
+      0000019e: 89 45 88                            i102 mov
+      000001a1: 8b 45 88                            i103 mov
+      000001a4: c9                                  i104 leave
+      000001a5: c3                                  i105 return
+  function f3 study_fn_1 @0x000001b0
+    b18 @0x000001b0
+      000001b0: 55                                  i106 push
+      000001b1: 48 89 e5                            i107 mov
+      000001b4: 48 81 ec 30 00 00 00                i108 sub
+      000001bb: b8 0a 00 00 00                      i109 mov
+      000001c0: 89 45 f0                            i110 mov
+      000001c3: 8b 7d f0                            i111 mov
+      000001c6: e8 35 ff ff ff                      i112 call f2
+      000001cb: 89 45 e8                            i113 mov
+      000001ce: 8b 45 e8                            i114 mov
+      000001d1: 89 45 f8                            i115 mov
+      000001d4: 8b 45 f8                            i116 mov
+      000001d7: 89 45 e0                            i117 mov
+      000001da: 8b 7d e0                            i118 mov
+      000001dd: e8 2e fe ff ff                      i119 call f1
+      000001e2: b8 00 00 00 00                      i120 mov
+      000001e7: 89 45 d8                            i121 mov
+      000001ea: 8b 45 d8                            i122 mov
+      000001ed: c9                                  i123 leave
+      000001ee: c3                                  i124 return
+}

@@ -1,0 +1,379 @@
+
+/tmp/study-encoder-record.ncJatP/operations.via-asm:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	e8 bb 01 00 00       	call   4011c0 <study_fn_2>
+  401005:	89 c7                	mov    edi,eax
+  401007:	b8 3c 00 00 00       	mov    eax,0x3c
+  40100c:	0f 05                	syscall
+  40100e:	0f 0b                	ud2
+
+0000000000401010 <study_rt_print_i32>:
+  401010:	55                   	push   rbp
+  401011:	48 89 e5             	mov    rbp,rsp
+  401014:	48 83 ec 40          	sub    rsp,0x40
+  401018:	45 31 c0             	xor    r8d,r8d
+  40101b:	89 f8                	mov    eax,edi
+  40101d:	85 c0                	test   eax,eax
+  40101f:	79 0c                	jns    40102d <study_rt_print_i32+0x1d>
+  401021:	eb 00                	jmp    401023 <study_rt_print_i32+0x13>
+  401023:	41 b8 01 00 00 00    	mov    r8d,0x1
+  401029:	f7 d8                	neg    eax
+  40102b:	eb 00                	jmp    40102d <study_rt_print_i32+0x1d>
+  40102d:	48 8d 75 ff          	lea    rsi,[rbp-0x1]
+  401031:	c6 06 0a             	mov    BYTE PTR [rsi],0xa
+  401034:	41 b9 01 00 00 00    	mov    r9d,0x1
+  40103a:	85 c0                	test   eax,eax
+  40103c:	75 0d                	jne    40104b <study_rt_print_i32+0x3b>
+  40103e:	eb 00                	jmp    401040 <study_rt_print_i32+0x30>
+  401040:	48 ff ce             	dec    rsi
+  401043:	c6 06 30             	mov    BYTE PTR [rsi],0x30
+  401046:	49 ff c1             	inc    r9
+  401049:	eb 1a                	jmp    401065 <study_rt_print_i32+0x55>
+  40104b:	31 d2                	xor    edx,edx
+  40104d:	b9 0a 00 00 00       	mov    ecx,0xa
+  401052:	f7 f1                	div    ecx
+  401054:	80 c2 30             	add    dl,0x30
+  401057:	48 ff ce             	dec    rsi
+  40105a:	88 16                	mov    BYTE PTR [rsi],dl
+  40105c:	49 ff c1             	inc    r9
+  40105f:	85 c0                	test   eax,eax
+  401061:	75 e8                	jne    40104b <study_rt_print_i32+0x3b>
+  401063:	eb 00                	jmp    401065 <study_rt_print_i32+0x55>
+  401065:	45 85 c0             	test   r8d,r8d
+  401068:	74 0d                	je     401077 <study_rt_print_i32+0x67>
+  40106a:	eb 00                	jmp    40106c <study_rt_print_i32+0x5c>
+  40106c:	48 ff ce             	dec    rsi
+  40106f:	c6 06 2d             	mov    BYTE PTR [rsi],0x2d
+  401072:	49 ff c1             	inc    r9
+  401075:	eb 00                	jmp    401077 <study_rt_print_i32+0x67>
+  401077:	4c 89 ca             	mov    rdx,r9
+  40107a:	eb 00                	jmp    40107c <study_rt_print_i32+0x6c>
+  40107c:	b8 01 00 00 00       	mov    eax,0x1
+  401081:	bf 01 00 00 00       	mov    edi,0x1
+  401086:	0f 05                	syscall
+  401088:	48 83 f8 fc          	cmp    rax,0xfffffffffffffffc
+  40108c:	74 ee                	je     40107c <study_rt_print_i32+0x6c>
+  40108e:	eb 00                	jmp    401090 <study_rt_print_i32+0x80>
+  401090:	48 85 c0             	test   rax,rax
+  401093:	7e 11                	jle    4010a6 <study_rt_print_i32+0x96>
+  401095:	eb 00                	jmp    401097 <study_rt_print_i32+0x87>
+  401097:	48 01 c6             	add    rsi,rax
+  40109a:	48 29 c2             	sub    rdx,rax
+  40109d:	48 85 d2             	test   rdx,rdx
+  4010a0:	75 da                	jne    40107c <study_rt_print_i32+0x6c>
+  4010a2:	eb 00                	jmp    4010a4 <study_rt_print_i32+0x94>
+  4010a4:	c9                   	leave
+  4010a5:	c3                   	ret
+  4010a6:	bf 4a 00 00 00       	mov    edi,0x4a
+  4010ab:	b8 3c 00 00 00       	mov    eax,0x3c
+  4010b0:	0f 05                	syscall
+  4010b2:	0f 0b                	ud2
+  4010b4:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
+  4010bb:	00 00 00 00 
+  4010bf:	90                   	nop
+
+00000000004010c0 <study_fn_0>:
+  4010c0:	55                   	push   rbp
+  4010c1:	48 89 e5             	mov    rbp,rsp
+  4010c4:	48 83 ec 60          	sub    rsp,0x60
+  4010c8:	89 7d f8             	mov    DWORD PTR [rbp-0x8],edi
+  4010cb:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  4010ce:	89 45 f0             	mov    DWORD PTR [rbp-0x10],eax
+  4010d1:	b8 00 00 00 00       	mov    eax,0x0
+  4010d6:	89 45 e8             	mov    DWORD PTR [rbp-0x18],eax
+  4010d9:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  4010dc:	3b 45 e8             	cmp    eax,DWORD PTR [rbp-0x18]
+  4010df:	0f 94 c0             	sete   al
+  4010e2:	0f b6 c0             	movzx  eax,al
+  4010e5:	89 45 e0             	mov    DWORD PTR [rbp-0x20],eax
+  4010e8:	83 7d e0 00          	cmp    DWORD PTR [rbp-0x20],0x0
+  4010ec:	75 02                	jne    4010f0 <study_fn_0+0x30>
+  4010ee:	eb 0d                	jmp    4010fd <study_fn_0+0x3d>
+  4010f0:	b8 00 00 00 00       	mov    eax,0x0
+  4010f5:	89 45 d8             	mov    DWORD PTR [rbp-0x28],eax
+  4010f8:	8b 45 d8             	mov    eax,DWORD PTR [rbp-0x28]
+  4010fb:	c9                   	leave
+  4010fc:	c3                   	ret
+  4010fd:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  401100:	89 45 d0             	mov    DWORD PTR [rbp-0x30],eax
+  401103:	b8 01 00 00 00       	mov    eax,0x1
+  401108:	89 45 c8             	mov    DWORD PTR [rbp-0x38],eax
+  40110b:	8b 45 d0             	mov    eax,DWORD PTR [rbp-0x30]
+  40110e:	2b 45 c8             	sub    eax,DWORD PTR [rbp-0x38]
+  401111:	89 45 c0             	mov    DWORD PTR [rbp-0x40],eax
+  401114:	8b 7d c0             	mov    edi,DWORD PTR [rbp-0x40]
+  401117:	e8 a4 ff ff ff       	call   4010c0 <study_fn_0>
+  40111c:	89 45 b8             	mov    DWORD PTR [rbp-0x48],eax
+  40111f:	b8 01 00 00 00       	mov    eax,0x1
+  401124:	89 45 b0             	mov    DWORD PTR [rbp-0x50],eax
+  401127:	8b 45 b8             	mov    eax,DWORD PTR [rbp-0x48]
+  40112a:	03 45 b0             	add    eax,DWORD PTR [rbp-0x50]
+  40112d:	89 45 a8             	mov    DWORD PTR [rbp-0x58],eax
+  401130:	8b 45 a8             	mov    eax,DWORD PTR [rbp-0x58]
+  401133:	c9                   	leave
+  401134:	c3                   	ret
+  401135:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
+  40113c:	00 00 00 00 
+
+0000000000401140 <study_fn_1>:
+  401140:	55                   	push   rbp
+  401141:	48 89 e5             	mov    rbp,rsp
+  401144:	48 81 ec 90 00 00 00 	sub    rsp,0x90
+  40114b:	89 7d f8             	mov    DWORD PTR [rbp-0x8],edi
+  40114e:	89 75 f0             	mov    DWORD PTR [rbp-0x10],esi
+  401151:	89 55 e8             	mov    DWORD PTR [rbp-0x18],edx
+  401154:	89 4d e0             	mov    DWORD PTR [rbp-0x20],ecx
+  401157:	44 89 45 d8          	mov    DWORD PTR [rbp-0x28],r8d
+  40115b:	44 89 4d d0          	mov    DWORD PTR [rbp-0x30],r9d
+  40115f:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  401162:	89 45 c8             	mov    DWORD PTR [rbp-0x38],eax
+  401165:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  401168:	89 45 c0             	mov    DWORD PTR [rbp-0x40],eax
+  40116b:	8b 45 c8             	mov    eax,DWORD PTR [rbp-0x38]
+  40116e:	03 45 c0             	add    eax,DWORD PTR [rbp-0x40]
+  401171:	89 45 b8             	mov    DWORD PTR [rbp-0x48],eax
+  401174:	8b 45 e8             	mov    eax,DWORD PTR [rbp-0x18]
+  401177:	89 45 b0             	mov    DWORD PTR [rbp-0x50],eax
+  40117a:	8b 45 b8             	mov    eax,DWORD PTR [rbp-0x48]
+  40117d:	03 45 b0             	add    eax,DWORD PTR [rbp-0x50]
+  401180:	89 45 a8             	mov    DWORD PTR [rbp-0x58],eax
+  401183:	8b 45 e0             	mov    eax,DWORD PTR [rbp-0x20]
+  401186:	89 45 a0             	mov    DWORD PTR [rbp-0x60],eax
+  401189:	8b 45 a8             	mov    eax,DWORD PTR [rbp-0x58]
+  40118c:	03 45 a0             	add    eax,DWORD PTR [rbp-0x60]
+  40118f:	89 45 98             	mov    DWORD PTR [rbp-0x68],eax
+  401192:	8b 45 d8             	mov    eax,DWORD PTR [rbp-0x28]
+  401195:	89 45 90             	mov    DWORD PTR [rbp-0x70],eax
+  401198:	8b 45 98             	mov    eax,DWORD PTR [rbp-0x68]
+  40119b:	03 45 90             	add    eax,DWORD PTR [rbp-0x70]
+  40119e:	89 45 88             	mov    DWORD PTR [rbp-0x78],eax
+  4011a1:	8b 45 d0             	mov    eax,DWORD PTR [rbp-0x30]
+  4011a4:	89 45 80             	mov    DWORD PTR [rbp-0x80],eax
+  4011a7:	8b 45 88             	mov    eax,DWORD PTR [rbp-0x78]
+  4011aa:	03 45 80             	add    eax,DWORD PTR [rbp-0x80]
+  4011ad:	89 85 78 ff ff ff    	mov    DWORD PTR [rbp-0x88],eax
+  4011b3:	8b 85 78 ff ff ff    	mov    eax,DWORD PTR [rbp-0x88]
+  4011b9:	c9                   	leave
+  4011ba:	c3                   	ret
+  4011bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000004011c0 <study_fn_2>:
+  4011c0:	55                   	push   rbp
+  4011c1:	48 89 e5             	mov    rbp,rsp
+  4011c4:	48 81 ec d0 01 00 00 	sub    rsp,0x1d0
+  4011cb:	b8 01 00 00 00       	mov    eax,0x1
+  4011d0:	89 45 e0             	mov    DWORD PTR [rbp-0x20],eax
+  4011d3:	b8 02 00 00 00       	mov    eax,0x2
+  4011d8:	89 45 d8             	mov    DWORD PTR [rbp-0x28],eax
+  4011db:	b8 03 00 00 00       	mov    eax,0x3
+  4011e0:	89 45 d0             	mov    DWORD PTR [rbp-0x30],eax
+  4011e3:	b8 04 00 00 00       	mov    eax,0x4
+  4011e8:	89 45 c8             	mov    DWORD PTR [rbp-0x38],eax
+  4011eb:	b8 05 00 00 00       	mov    eax,0x5
+  4011f0:	89 45 c0             	mov    DWORD PTR [rbp-0x40],eax
+  4011f3:	b8 06 00 00 00       	mov    eax,0x6
+  4011f8:	89 45 b8             	mov    DWORD PTR [rbp-0x48],eax
+  4011fb:	8b 7d e0             	mov    edi,DWORD PTR [rbp-0x20]
+  4011fe:	8b 75 d8             	mov    esi,DWORD PTR [rbp-0x28]
+  401201:	8b 55 d0             	mov    edx,DWORD PTR [rbp-0x30]
+  401204:	8b 4d c8             	mov    ecx,DWORD PTR [rbp-0x38]
+  401207:	44 8b 45 c0          	mov    r8d,DWORD PTR [rbp-0x40]
+  40120b:	44 8b 4d b8          	mov    r9d,DWORD PTR [rbp-0x48]
+  40120f:	e8 2c ff ff ff       	call   401140 <study_fn_1>
+  401214:	89 45 b0             	mov    DWORD PTR [rbp-0x50],eax
+  401217:	8b 45 b0             	mov    eax,DWORD PTR [rbp-0x50]
+  40121a:	89 45 f8             	mov    DWORD PTR [rbp-0x8],eax
+  40121d:	b8 06 00 00 00       	mov    eax,0x6
+  401222:	89 45 a8             	mov    DWORD PTR [rbp-0x58],eax
+  401225:	b8 07 00 00 00       	mov    eax,0x7
+  40122a:	89 45 a0             	mov    DWORD PTR [rbp-0x60],eax
+  40122d:	8b 45 a8             	mov    eax,DWORD PTR [rbp-0x58]
+  401230:	0f af 45 a0          	imul   eax,DWORD PTR [rbp-0x60]
+  401234:	89 45 98             	mov    DWORD PTR [rbp-0x68],eax
+  401237:	b8 02 00 00 00       	mov    eax,0x2
+  40123c:	89 45 90             	mov    DWORD PTR [rbp-0x70],eax
+  40123f:	8b 45 98             	mov    eax,DWORD PTR [rbp-0x68]
+  401242:	2b 45 90             	sub    eax,DWORD PTR [rbp-0x70]
+  401245:	89 45 88             	mov    DWORD PTR [rbp-0x78],eax
+  401248:	8b 45 88             	mov    eax,DWORD PTR [rbp-0x78]
+  40124b:	89 45 f0             	mov    DWORD PTR [rbp-0x10],eax
+  40124e:	b8 ff ff ff 7f       	mov    eax,0x7fffffff
+  401253:	89 45 80             	mov    DWORD PTR [rbp-0x80],eax
+  401256:	b8 01 00 00 00       	mov    eax,0x1
+  40125b:	89 85 78 ff ff ff    	mov    DWORD PTR [rbp-0x88],eax
+  401261:	8b 45 80             	mov    eax,DWORD PTR [rbp-0x80]
+  401264:	03 85 78 ff ff ff    	add    eax,DWORD PTR [rbp-0x88]
+  40126a:	89 85 70 ff ff ff    	mov    DWORD PTR [rbp-0x90],eax
+  401270:	8b 85 70 ff ff ff    	mov    eax,DWORD PTR [rbp-0x90]
+  401276:	89 45 e8             	mov    DWORD PTR [rbp-0x18],eax
+  401279:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  40127c:	89 85 68 ff ff ff    	mov    DWORD PTR [rbp-0x98],eax
+  401282:	8b bd 68 ff ff ff    	mov    edi,DWORD PTR [rbp-0x98]
+  401288:	e8 83 fd ff ff       	call   401010 <study_rt_print_i32>
+  40128d:	8b 45 f0             	mov    eax,DWORD PTR [rbp-0x10]
+  401290:	89 85 60 ff ff ff    	mov    DWORD PTR [rbp-0xa0],eax
+  401296:	8b bd 60 ff ff ff    	mov    edi,DWORD PTR [rbp-0xa0]
+  40129c:	e8 6f fd ff ff       	call   401010 <study_rt_print_i32>
+  4012a1:	8b 45 e8             	mov    eax,DWORD PTR [rbp-0x18]
+  4012a4:	89 85 58 ff ff ff    	mov    DWORD PTR [rbp-0xa8],eax
+  4012aa:	8b bd 58 ff ff ff    	mov    edi,DWORD PTR [rbp-0xa8]
+  4012b0:	e8 5b fd ff ff       	call   401010 <study_rt_print_i32>
+  4012b5:	b8 07 00 00 00       	mov    eax,0x7
+  4012ba:	89 85 50 ff ff ff    	mov    DWORD PTR [rbp-0xb0],eax
+  4012c0:	8b 85 50 ff ff ff    	mov    eax,DWORD PTR [rbp-0xb0]
+  4012c6:	f7 d8                	neg    eax
+  4012c8:	89 85 48 ff ff ff    	mov    DWORD PTR [rbp-0xb8],eax
+  4012ce:	8b bd 48 ff ff ff    	mov    edi,DWORD PTR [rbp-0xb8]
+  4012d4:	e8 37 fd ff ff       	call   401010 <study_rt_print_i32>
+  4012d9:	b8 05 00 00 00       	mov    eax,0x5
+  4012de:	89 85 40 ff ff ff    	mov    DWORD PTR [rbp-0xc0],eax
+  4012e4:	8b bd 40 ff ff ff    	mov    edi,DWORD PTR [rbp-0xc0]
+  4012ea:	e8 d1 fd ff ff       	call   4010c0 <study_fn_0>
+  4012ef:	89 85 38 ff ff ff    	mov    DWORD PTR [rbp-0xc8],eax
+  4012f5:	8b bd 38 ff ff ff    	mov    edi,DWORD PTR [rbp-0xc8]
+  4012fb:	e8 10 fd ff ff       	call   401010 <study_rt_print_i32>
+  401300:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  401303:	89 85 30 ff ff ff    	mov    DWORD PTR [rbp-0xd0],eax
+  401309:	b8 15 00 00 00       	mov    eax,0x15
+  40130e:	89 85 28 ff ff ff    	mov    DWORD PTR [rbp-0xd8],eax
+  401314:	8b 85 30 ff ff ff    	mov    eax,DWORD PTR [rbp-0xd0]
+  40131a:	3b 85 28 ff ff ff    	cmp    eax,DWORD PTR [rbp-0xd8]
+  401320:	0f 95 c0             	setne  al
+  401323:	0f b6 c0             	movzx  eax,al
+  401326:	89 85 20 ff ff ff    	mov    DWORD PTR [rbp-0xe0],eax
+  40132c:	83 bd 20 ff ff ff 00 	cmp    DWORD PTR [rbp-0xe0],0x0
+  401333:	0f 94 c0             	sete   al
+  401336:	0f b6 c0             	movzx  eax,al
+  401339:	89 85 18 ff ff ff    	mov    DWORD PTR [rbp-0xe8],eax
+  40133f:	83 bd 18 ff ff ff 00 	cmp    DWORD PTR [rbp-0xe8],0x0
+  401346:	75 02                	jne    40134a <study_fn_2+0x18a>
+  401348:	eb 18                	jmp    401362 <study_fn_2+0x1a2>
+  40134a:	b8 01 00 00 00       	mov    eax,0x1
+  40134f:	89 85 10 ff ff ff    	mov    DWORD PTR [rbp-0xf0],eax
+  401355:	8b bd 10 ff ff ff    	mov    edi,DWORD PTR [rbp-0xf0]
+  40135b:	e8 b0 fc ff ff       	call   401010 <study_rt_print_i32>
+  401360:	eb 18                	jmp    40137a <study_fn_2+0x1ba>
+  401362:	b8 00 00 00 00       	mov    eax,0x0
+  401367:	89 85 08 ff ff ff    	mov    DWORD PTR [rbp-0xf8],eax
+  40136d:	8b bd 08 ff ff ff    	mov    edi,DWORD PTR [rbp-0xf8]
+  401373:	e8 98 fc ff ff       	call   401010 <study_rt_print_i32>
+  401378:	eb 00                	jmp    40137a <study_fn_2+0x1ba>
+  40137a:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  40137d:	89 85 00 ff ff ff    	mov    DWORD PTR [rbp-0x100],eax
+  401383:	b8 16 00 00 00       	mov    eax,0x16
+  401388:	89 85 f8 fe ff ff    	mov    DWORD PTR [rbp-0x108],eax
+  40138e:	8b 85 00 ff ff ff    	mov    eax,DWORD PTR [rbp-0x100]
+  401394:	3b 85 f8 fe ff ff    	cmp    eax,DWORD PTR [rbp-0x108]
+  40139a:	0f 9c c0             	setl   al
+  40139d:	0f b6 c0             	movzx  eax,al
+  4013a0:	89 85 f0 fe ff ff    	mov    DWORD PTR [rbp-0x110],eax
+  4013a6:	83 bd f0 fe ff ff 00 	cmp    DWORD PTR [rbp-0x110],0x0
+  4013ad:	75 02                	jne    4013b1 <study_fn_2+0x1f1>
+  4013af:	eb 18                	jmp    4013c9 <study_fn_2+0x209>
+  4013b1:	b8 02 00 00 00       	mov    eax,0x2
+  4013b6:	89 85 e8 fe ff ff    	mov    DWORD PTR [rbp-0x118],eax
+  4013bc:	8b bd e8 fe ff ff    	mov    edi,DWORD PTR [rbp-0x118]
+  4013c2:	e8 49 fc ff ff       	call   401010 <study_rt_print_i32>
+  4013c7:	eb 18                	jmp    4013e1 <study_fn_2+0x221>
+  4013c9:	b8 00 00 00 00       	mov    eax,0x0
+  4013ce:	89 85 e0 fe ff ff    	mov    DWORD PTR [rbp-0x120],eax
+  4013d4:	8b bd e0 fe ff ff    	mov    edi,DWORD PTR [rbp-0x120]
+  4013da:	e8 31 fc ff ff       	call   401010 <study_rt_print_i32>
+  4013df:	eb 00                	jmp    4013e1 <study_fn_2+0x221>
+  4013e1:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  4013e4:	89 85 d8 fe ff ff    	mov    DWORD PTR [rbp-0x128],eax
+  4013ea:	b8 15 00 00 00       	mov    eax,0x15
+  4013ef:	89 85 d0 fe ff ff    	mov    DWORD PTR [rbp-0x130],eax
+  4013f5:	8b 85 d8 fe ff ff    	mov    eax,DWORD PTR [rbp-0x128]
+  4013fb:	3b 85 d0 fe ff ff    	cmp    eax,DWORD PTR [rbp-0x130]
+  401401:	0f 9e c0             	setle  al
+  401404:	0f b6 c0             	movzx  eax,al
+  401407:	89 85 c8 fe ff ff    	mov    DWORD PTR [rbp-0x138],eax
+  40140d:	83 bd c8 fe ff ff 00 	cmp    DWORD PTR [rbp-0x138],0x0
+  401414:	75 02                	jne    401418 <study_fn_2+0x258>
+  401416:	eb 18                	jmp    401430 <study_fn_2+0x270>
+  401418:	b8 03 00 00 00       	mov    eax,0x3
+  40141d:	89 85 c0 fe ff ff    	mov    DWORD PTR [rbp-0x140],eax
+  401423:	8b bd c0 fe ff ff    	mov    edi,DWORD PTR [rbp-0x140]
+  401429:	e8 e2 fb ff ff       	call   401010 <study_rt_print_i32>
+  40142e:	eb 18                	jmp    401448 <study_fn_2+0x288>
+  401430:	b8 00 00 00 00       	mov    eax,0x0
+  401435:	89 85 b8 fe ff ff    	mov    DWORD PTR [rbp-0x148],eax
+  40143b:	8b bd b8 fe ff ff    	mov    edi,DWORD PTR [rbp-0x148]
+  401441:	e8 ca fb ff ff       	call   401010 <study_rt_print_i32>
+  401446:	eb 00                	jmp    401448 <study_fn_2+0x288>
+  401448:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  40144b:	89 85 b0 fe ff ff    	mov    DWORD PTR [rbp-0x150],eax
+  401451:	b8 14 00 00 00       	mov    eax,0x14
+  401456:	89 85 a8 fe ff ff    	mov    DWORD PTR [rbp-0x158],eax
+  40145c:	8b 85 b0 fe ff ff    	mov    eax,DWORD PTR [rbp-0x150]
+  401462:	3b 85 a8 fe ff ff    	cmp    eax,DWORD PTR [rbp-0x158]
+  401468:	0f 9f c0             	setg   al
+  40146b:	0f b6 c0             	movzx  eax,al
+  40146e:	89 85 a0 fe ff ff    	mov    DWORD PTR [rbp-0x160],eax
+  401474:	83 bd a0 fe ff ff 00 	cmp    DWORD PTR [rbp-0x160],0x0
+  40147b:	75 02                	jne    40147f <study_fn_2+0x2bf>
+  40147d:	eb 18                	jmp    401497 <study_fn_2+0x2d7>
+  40147f:	b8 04 00 00 00       	mov    eax,0x4
+  401484:	89 85 98 fe ff ff    	mov    DWORD PTR [rbp-0x168],eax
+  40148a:	8b bd 98 fe ff ff    	mov    edi,DWORD PTR [rbp-0x168]
+  401490:	e8 7b fb ff ff       	call   401010 <study_rt_print_i32>
+  401495:	eb 18                	jmp    4014af <study_fn_2+0x2ef>
+  401497:	b8 00 00 00 00       	mov    eax,0x0
+  40149c:	89 85 90 fe ff ff    	mov    DWORD PTR [rbp-0x170],eax
+  4014a2:	8b bd 90 fe ff ff    	mov    edi,DWORD PTR [rbp-0x170]
+  4014a8:	e8 63 fb ff ff       	call   401010 <study_rt_print_i32>
+  4014ad:	eb 00                	jmp    4014af <study_fn_2+0x2ef>
+  4014af:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+  4014b2:	89 85 88 fe ff ff    	mov    DWORD PTR [rbp-0x178],eax
+  4014b8:	b8 15 00 00 00       	mov    eax,0x15
+  4014bd:	89 85 80 fe ff ff    	mov    DWORD PTR [rbp-0x180],eax
+  4014c3:	8b 85 88 fe ff ff    	mov    eax,DWORD PTR [rbp-0x178]
+  4014c9:	3b 85 80 fe ff ff    	cmp    eax,DWORD PTR [rbp-0x180]
+  4014cf:	0f 9d c0             	setge  al
+  4014d2:	0f b6 c0             	movzx  eax,al
+  4014d5:	89 85 78 fe ff ff    	mov    DWORD PTR [rbp-0x188],eax
+  4014db:	83 bd 78 fe ff ff 00 	cmp    DWORD PTR [rbp-0x188],0x0
+  4014e2:	75 02                	jne    4014e6 <study_fn_2+0x326>
+  4014e4:	eb 18                	jmp    4014fe <study_fn_2+0x33e>
+  4014e6:	b8 05 00 00 00       	mov    eax,0x5
+  4014eb:	89 85 70 fe ff ff    	mov    DWORD PTR [rbp-0x190],eax
+  4014f1:	8b bd 70 fe ff ff    	mov    edi,DWORD PTR [rbp-0x190]
+  4014f7:	e8 14 fb ff ff       	call   401010 <study_rt_print_i32>
+  4014fc:	eb 18                	jmp    401516 <study_fn_2+0x356>
+  4014fe:	b8 00 00 00 00       	mov    eax,0x0
+  401503:	89 85 68 fe ff ff    	mov    DWORD PTR [rbp-0x198],eax
+  401509:	8b bd 68 fe ff ff    	mov    edi,DWORD PTR [rbp-0x198]
+  40150f:	e8 fc fa ff ff       	call   401010 <study_rt_print_i32>
+  401514:	eb 00                	jmp    401516 <study_fn_2+0x356>
+  401516:	b8 01 00 00 00       	mov    eax,0x1
+  40151b:	89 85 60 fe ff ff    	mov    DWORD PTR [rbp-0x1a0],eax
+  401521:	b8 01 00 00 00       	mov    eax,0x1
+  401526:	89 85 58 fe ff ff    	mov    DWORD PTR [rbp-0x1a8],eax
+  40152c:	8b 85 60 fe ff ff    	mov    eax,DWORD PTR [rbp-0x1a0]
+  401532:	3b 85 58 fe ff ff    	cmp    eax,DWORD PTR [rbp-0x1a8]
+  401538:	0f 94 c0             	sete   al
+  40153b:	0f b6 c0             	movzx  eax,al
+  40153e:	89 85 50 fe ff ff    	mov    DWORD PTR [rbp-0x1b0],eax
+  401544:	83 bd 50 fe ff ff 00 	cmp    DWORD PTR [rbp-0x1b0],0x0
+  40154b:	75 02                	jne    40154f <study_fn_2+0x38f>
+  40154d:	eb 18                	jmp    401567 <study_fn_2+0x3a7>
+  40154f:	b8 06 00 00 00       	mov    eax,0x6
+  401554:	89 85 48 fe ff ff    	mov    DWORD PTR [rbp-0x1b8],eax
+  40155a:	8b bd 48 fe ff ff    	mov    edi,DWORD PTR [rbp-0x1b8]
+  401560:	e8 ab fa ff ff       	call   401010 <study_rt_print_i32>
+  401565:	eb 18                	jmp    40157f <study_fn_2+0x3bf>
+  401567:	b8 00 00 00 00       	mov    eax,0x0
+  40156c:	89 85 40 fe ff ff    	mov    DWORD PTR [rbp-0x1c0],eax
+  401572:	8b bd 40 fe ff ff    	mov    edi,DWORD PTR [rbp-0x1c0]
+  401578:	e8 93 fa ff ff       	call   401010 <study_rt_print_i32>
+  40157d:	eb 00                	jmp    40157f <study_fn_2+0x3bf>
+  40157f:	b8 25 00 00 00       	mov    eax,0x25
+  401584:	89 85 38 fe ff ff    	mov    DWORD PTR [rbp-0x1c8],eax
+  40158a:	8b 85 38 fe ff ff    	mov    eax,DWORD PTR [rbp-0x1c8]
+  401590:	c9                   	leave
+  401591:	c3                   	ret

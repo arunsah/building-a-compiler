@@ -1,0 +1,388 @@
+image x86-64-linux-system-v [bytes=1619, entry=0x00000000] {
+  function f0 _start @0x00000000
+    b0 @0x00000000
+      00000000: e8 0b 02 00 00                      i0 call f4
+      00000005: 89 c7                               i1 mov
+      00000007: b8 3c 00 00 00                      i2 mov
+      0000000c: 0f 05                               i3 syscall
+      0000000e: 0f 0b                               i4 undefined
+  function f1 study_rt_print_i32 @0x00000010
+    b1 @0x00000010
+      00000010: 55                                  i5 push
+      00000011: 48 89 e5                            i6 mov
+      00000014: 48 81 ec 40 00 00 00                i7 sub
+      0000001b: 45 31 c0                            i8 xor
+      0000001e: 89 f8                               i9 mov
+      00000020: 85 c0                               i10 test
+      00000022: 0f 89 12 00 00 00 e9 00 00 00 00    i11 branch b3, b2
+    b2 @0x0000002d
+      0000002d: 41 b8 01 00 00 00                   i12 mov
+      00000033: f7 d8                               i13 neg
+      00000035: e9 00 00 00 00                      i14 jump b3
+    b3 @0x0000003a
+      0000003a: 48 8d 75 ff                         i15 lea
+      0000003e: 40 c6 06 0a                         i16 mov
+      00000042: 41 b9 01 00 00 00                   i17 mov
+      00000048: 85 c0                               i18 test
+      0000004a: 0f 85 14 00 00 00 e9 00 00 00 00    i19 branch b5, b4
+    b4 @0x00000055
+      00000055: 48 ff ce                            i20 dec
+      00000058: 40 c6 06 30                         i21 mov
+      0000005c: 49 ff c1                            i22 inc
+      0000005f: e9 23 00 00 00                      i23 jump b6
+    b5 @0x00000064
+      00000064: 31 d2                               i24 xor
+      00000066: b9 0a 00 00 00                      i25 mov
+      0000006b: f7 f1                               i26 div
+      0000006d: 40 80 c2 30                         i27 add
+      00000071: 48 ff ce                            i28 dec
+      00000074: 40 88 16                            i29 mov
+      00000077: 49 ff c1                            i30 inc
+      0000007a: 85 c0                               i31 test
+      0000007c: 0f 85 e2 ff ff ff e9 00 00 00 00    i32 branch b5, b6
+    b6 @0x00000087
+      00000087: 45 85 c0                            i33 test
+      0000008a: 0f 84 14 00 00 00 e9 00 00 00 00    i34 branch b8, b7
+    b7 @0x00000095
+      00000095: 48 ff ce                            i35 dec
+      00000098: 40 c6 06 2d                         i36 mov
+      0000009c: 49 ff c1                            i37 inc
+      0000009f: e9 00 00 00 00                      i38 jump b8
+    b8 @0x000000a4
+      000000a4: 4c 89 ca                            i39 mov
+      000000a7: e9 00 00 00 00                      i40 jump b9
+    b9 @0x000000ac
+      000000ac: b8 01 00 00 00                      i41 mov
+      000000b1: bf 01 00 00 00                      i42 mov
+      000000b6: 0f 05                               i43 syscall
+      000000b8: 48 81 f8 fc ff ff ff                i44 cmp
+      000000bf: 0f 84 e7 ff ff ff e9 00 00 00 00    i45 branch b9, b10
+    b10 @0x000000ca
+      000000ca: 48 85 c0                            i46 test
+      000000cd: 0f 8e 1b 00 00 00 e9 00 00 00 00    i47 branch b13, b11
+    b11 @0x000000d8
+      000000d8: 48 01 c6                            i48 add
+      000000db: 48 29 c2                            i49 sub
+      000000de: 48 85 d2                            i50 test
+      000000e1: 0f 85 c5 ff ff ff e9 00 00 00 00    i51 branch b9, b12
+    b12 @0x000000ec
+      000000ec: c9                                  i52 leave
+      000000ed: c3                                  i53 return
+    b13 @0x000000ee
+      000000ee: bf 4a 00 00 00                      i54 mov
+      000000f3: b8 3c 00 00 00                      i55 mov
+      000000f8: 0f 05                               i56 syscall
+      000000fa: 0f 0b                               i57 undefined
+  function f2 study_fn_0 @0x00000100
+    b14 @0x00000100
+      00000100: 55                                  i58 push
+      00000101: 48 89 e5                            i59 mov
+      00000104: 48 81 ec 60 00 00 00                i60 sub
+      0000010b: 89 7d f8                            i61 mov
+      0000010e: 8b 45 f8                            i62 mov
+      00000111: 89 45 f0                            i63 mov
+      00000114: b8 00 00 00 00                      i64 mov
+      00000119: 89 45 e8                            i65 mov
+      0000011c: 8b 45 f0                            i66 mov
+      0000011f: 3b 45 e8                            i67 cmp
+      00000122: 40 0f 94 c0                         i68 set
+      00000126: 40 0f b6 c0                         i69 movzx
+      0000012a: 89 45 e0                            i70 mov
+      0000012d: 81 7d e0 00 00 00 00                i71 cmp
+      00000134: 0f 85 05 00 00 00 e9 0d 00 00 00    i72 branch b15, b16
+    b15 @0x0000013f
+      0000013f: b8 00 00 00 00                      i73 mov
+      00000144: 89 45 d8                            i74 mov
+      00000147: 8b 45 d8                            i75 mov
+      0000014a: c9                                  i76 leave
+      0000014b: c3                                  i77 return
+    b16 @0x0000014c
+      0000014c: 8b 45 f8                            i78 mov
+      0000014f: 89 45 d0                            i79 mov
+      00000152: b8 01 00 00 00                      i80 mov
+      00000157: 89 45 c8                            i81 mov
+      0000015a: 8b 45 d0                            i82 mov
+      0000015d: 2b 45 c8                            i83 sub
+      00000160: 89 45 c0                            i84 mov
+      00000163: 8b 7d c0                            i85 mov
+      00000166: e8 95 ff ff ff                      i86 call f2
+      0000016b: 89 45 b8                            i87 mov
+      0000016e: b8 01 00 00 00                      i88 mov
+      00000173: 89 45 b0                            i89 mov
+      00000176: 8b 45 b8                            i90 mov
+      00000179: 03 45 b0                            i91 add
+      0000017c: 89 45 a8                            i92 mov
+      0000017f: 8b 45 a8                            i93 mov
+      00000182: c9                                  i94 leave
+      00000183: c3                                  i95 return
+  function f3 study_fn_1 @0x00000190
+    b17 @0x00000190
+      00000190: 55                                  i96 push
+      00000191: 48 89 e5                            i97 mov
+      00000194: 48 81 ec 90 00 00 00                i98 sub
+      0000019b: 89 7d f8                            i99 mov
+      0000019e: 89 75 f0                            i100 mov
+      000001a1: 89 55 e8                            i101 mov
+      000001a4: 89 4d e0                            i102 mov
+      000001a7: 44 89 45 d8                         i103 mov
+      000001ab: 44 89 4d d0                         i104 mov
+      000001af: 8b 45 f8                            i105 mov
+      000001b2: 89 45 c8                            i106 mov
+      000001b5: 8b 45 f0                            i107 mov
+      000001b8: 89 45 c0                            i108 mov
+      000001bb: 8b 45 c8                            i109 mov
+      000001be: 03 45 c0                            i110 add
+      000001c1: 89 45 b8                            i111 mov
+      000001c4: 8b 45 e8                            i112 mov
+      000001c7: 89 45 b0                            i113 mov
+      000001ca: 8b 45 b8                            i114 mov
+      000001cd: 03 45 b0                            i115 add
+      000001d0: 89 45 a8                            i116 mov
+      000001d3: 8b 45 e0                            i117 mov
+      000001d6: 89 45 a0                            i118 mov
+      000001d9: 8b 45 a8                            i119 mov
+      000001dc: 03 45 a0                            i120 add
+      000001df: 89 45 98                            i121 mov
+      000001e2: 8b 45 d8                            i122 mov
+      000001e5: 89 45 90                            i123 mov
+      000001e8: 8b 45 98                            i124 mov
+      000001eb: 03 45 90                            i125 add
+      000001ee: 89 45 88                            i126 mov
+      000001f1: 8b 45 d0                            i127 mov
+      000001f4: 89 45 80                            i128 mov
+      000001f7: 8b 45 88                            i129 mov
+      000001fa: 03 45 80                            i130 add
+      000001fd: 89 85 78 ff ff ff                   i131 mov
+      00000203: 8b 85 78 ff ff ff                   i132 mov
+      00000209: c9                                  i133 leave
+      0000020a: c3                                  i134 return
+  function f4 study_fn_2 @0x00000210
+    b18 @0x00000210
+      00000210: 55                                  i135 push
+      00000211: 48 89 e5                            i136 mov
+      00000214: 48 81 ec d0 01 00 00                i137 sub
+      0000021b: b8 01 00 00 00                      i138 mov
+      00000220: 89 45 e0                            i139 mov
+      00000223: b8 02 00 00 00                      i140 mov
+      00000228: 89 45 d8                            i141 mov
+      0000022b: b8 03 00 00 00                      i142 mov
+      00000230: 89 45 d0                            i143 mov
+      00000233: b8 04 00 00 00                      i144 mov
+      00000238: 89 45 c8                            i145 mov
+      0000023b: b8 05 00 00 00                      i146 mov
+      00000240: 89 45 c0                            i147 mov
+      00000243: b8 06 00 00 00                      i148 mov
+      00000248: 89 45 b8                            i149 mov
+      0000024b: 8b 7d e0                            i150 mov
+      0000024e: 8b 75 d8                            i151 mov
+      00000251: 8b 55 d0                            i152 mov
+      00000254: 8b 4d c8                            i153 mov
+      00000257: 44 8b 45 c0                         i154 mov
+      0000025b: 44 8b 4d b8                         i155 mov
+      0000025f: e8 2c ff ff ff                      i156 call f3
+      00000264: 89 45 b0                            i157 mov
+      00000267: 8b 45 b0                            i158 mov
+      0000026a: 89 45 f8                            i159 mov
+      0000026d: b8 06 00 00 00                      i160 mov
+      00000272: 89 45 a8                            i161 mov
+      00000275: b8 07 00 00 00                      i162 mov
+      0000027a: 89 45 a0                            i163 mov
+      0000027d: 8b 45 a8                            i164 mov
+      00000280: 0f af 45 a0                         i165 imul
+      00000284: 89 45 98                            i166 mov
+      00000287: b8 02 00 00 00                      i167 mov
+      0000028c: 89 45 90                            i168 mov
+      0000028f: 8b 45 98                            i169 mov
+      00000292: 2b 45 90                            i170 sub
+      00000295: 89 45 88                            i171 mov
+      00000298: 8b 45 88                            i172 mov
+      0000029b: 89 45 f0                            i173 mov
+      0000029e: b8 ff ff ff 7f                      i174 mov
+      000002a3: 89 45 80                            i175 mov
+      000002a6: b8 01 00 00 00                      i176 mov
+      000002ab: 89 85 78 ff ff ff                   i177 mov
+      000002b1: 8b 45 80                            i178 mov
+      000002b4: 03 85 78 ff ff ff                   i179 add
+      000002ba: 89 85 70 ff ff ff                   i180 mov
+      000002c0: 8b 85 70 ff ff ff                   i181 mov
+      000002c6: 89 45 e8                            i182 mov
+      000002c9: 8b 45 f8                            i183 mov
+      000002cc: 89 85 68 ff ff ff                   i184 mov
+      000002d2: 8b bd 68 ff ff ff                   i185 mov
+      000002d8: e8 33 fd ff ff                      i186 call f1
+      000002dd: 8b 45 f0                            i187 mov
+      000002e0: 89 85 60 ff ff ff                   i188 mov
+      000002e6: 8b bd 60 ff ff ff                   i189 mov
+      000002ec: e8 1f fd ff ff                      i190 call f1
+      000002f1: 8b 45 e8                            i191 mov
+      000002f4: 89 85 58 ff ff ff                   i192 mov
+      000002fa: 8b bd 58 ff ff ff                   i193 mov
+      00000300: e8 0b fd ff ff                      i194 call f1
+      00000305: b8 07 00 00 00                      i195 mov
+      0000030a: 89 85 50 ff ff ff                   i196 mov
+      00000310: 8b 85 50 ff ff ff                   i197 mov
+      00000316: f7 d8                               i198 neg
+      00000318: 89 85 48 ff ff ff                   i199 mov
+      0000031e: 8b bd 48 ff ff ff                   i200 mov
+      00000324: e8 e7 fc ff ff                      i201 call f1
+      00000329: b8 05 00 00 00                      i202 mov
+      0000032e: 89 85 40 ff ff ff                   i203 mov
+      00000334: 8b bd 40 ff ff ff                   i204 mov
+      0000033a: e8 c1 fd ff ff                      i205 call f2
+      0000033f: 89 85 38 ff ff ff                   i206 mov
+      00000345: 8b bd 38 ff ff ff                   i207 mov
+      0000034b: e8 c0 fc ff ff                      i208 call f1
+      00000350: 8b 45 f8                            i209 mov
+      00000353: 89 85 30 ff ff ff                   i210 mov
+      00000359: b8 15 00 00 00                      i211 mov
+      0000035e: 89 85 28 ff ff ff                   i212 mov
+      00000364: 8b 85 30 ff ff ff                   i213 mov
+      0000036a: 3b 85 28 ff ff ff                   i214 cmp
+      00000370: 40 0f 95 c0                         i215 set
+      00000374: 40 0f b6 c0                         i216 movzx
+      00000378: 89 85 20 ff ff ff                   i217 mov
+      0000037e: 81 bd 20 ff ff ff 00 00 00 00       i218 cmp
+      00000388: 40 0f 94 c0                         i219 set
+      0000038c: 40 0f b6 c0                         i220 movzx
+      00000390: 89 85 18 ff ff ff                   i221 mov
+      00000396: 81 bd 18 ff ff ff 00 00 00 00       i222 cmp
+      000003a0: 0f 85 05 00 00 00 e9 1b 00 00 00    i223 branch b19, b20
+    b19 @0x000003ab
+      000003ab: b8 01 00 00 00                      i224 mov
+      000003b0: 89 85 10 ff ff ff                   i225 mov
+      000003b6: 8b bd 10 ff ff ff                   i226 mov
+      000003bc: e8 4f fc ff ff                      i227 call f1
+      000003c1: e9 1b 00 00 00                      i228 jump b21
+    b20 @0x000003c6
+      000003c6: b8 00 00 00 00                      i229 mov
+      000003cb: 89 85 08 ff ff ff                   i230 mov
+      000003d1: 8b bd 08 ff ff ff                   i231 mov
+      000003d7: e8 34 fc ff ff                      i232 call f1
+      000003dc: e9 00 00 00 00                      i233 jump b21
+    b21 @0x000003e1
+      000003e1: 8b 45 f8                            i234 mov
+      000003e4: 89 85 00 ff ff ff                   i235 mov
+      000003ea: b8 16 00 00 00                      i236 mov
+      000003ef: 89 85 f8 fe ff ff                   i237 mov
+      000003f5: 8b 85 00 ff ff ff                   i238 mov
+      000003fb: 3b 85 f8 fe ff ff                   i239 cmp
+      00000401: 40 0f 9c c0                         i240 set
+      00000405: 40 0f b6 c0                         i241 movzx
+      00000409: 89 85 f0 fe ff ff                   i242 mov
+      0000040f: 81 bd f0 fe ff ff 00 00 00 00       i243 cmp
+      00000419: 0f 85 05 00 00 00 e9 1b 00 00 00    i244 branch b22, b23
+    b22 @0x00000424
+      00000424: b8 02 00 00 00                      i245 mov
+      00000429: 89 85 e8 fe ff ff                   i246 mov
+      0000042f: 8b bd e8 fe ff ff                   i247 mov
+      00000435: e8 d6 fb ff ff                      i248 call f1
+      0000043a: e9 1b 00 00 00                      i249 jump b24
+    b23 @0x0000043f
+      0000043f: b8 00 00 00 00                      i250 mov
+      00000444: 89 85 e0 fe ff ff                   i251 mov
+      0000044a: 8b bd e0 fe ff ff                   i252 mov
+      00000450: e8 bb fb ff ff                      i253 call f1
+      00000455: e9 00 00 00 00                      i254 jump b24
+    b24 @0x0000045a
+      0000045a: 8b 45 f8                            i255 mov
+      0000045d: 89 85 d8 fe ff ff                   i256 mov
+      00000463: b8 15 00 00 00                      i257 mov
+      00000468: 89 85 d0 fe ff ff                   i258 mov
+      0000046e: 8b 85 d8 fe ff ff                   i259 mov
+      00000474: 3b 85 d0 fe ff ff                   i260 cmp
+      0000047a: 40 0f 9e c0                         i261 set
+      0000047e: 40 0f b6 c0                         i262 movzx
+      00000482: 89 85 c8 fe ff ff                   i263 mov
+      00000488: 81 bd c8 fe ff ff 00 00 00 00       i264 cmp
+      00000492: 0f 85 05 00 00 00 e9 1b 00 00 00    i265 branch b25, b26
+    b25 @0x0000049d
+      0000049d: b8 03 00 00 00                      i266 mov
+      000004a2: 89 85 c0 fe ff ff                   i267 mov
+      000004a8: 8b bd c0 fe ff ff                   i268 mov
+      000004ae: e8 5d fb ff ff                      i269 call f1
+      000004b3: e9 1b 00 00 00                      i270 jump b27
+    b26 @0x000004b8
+      000004b8: b8 00 00 00 00                      i271 mov
+      000004bd: 89 85 b8 fe ff ff                   i272 mov
+      000004c3: 8b bd b8 fe ff ff                   i273 mov
+      000004c9: e8 42 fb ff ff                      i274 call f1
+      000004ce: e9 00 00 00 00                      i275 jump b27
+    b27 @0x000004d3
+      000004d3: 8b 45 f8                            i276 mov
+      000004d6: 89 85 b0 fe ff ff                   i277 mov
+      000004dc: b8 14 00 00 00                      i278 mov
+      000004e1: 89 85 a8 fe ff ff                   i279 mov
+      000004e7: 8b 85 b0 fe ff ff                   i280 mov
+      000004ed: 3b 85 a8 fe ff ff                   i281 cmp
+      000004f3: 40 0f 9f c0                         i282 set
+      000004f7: 40 0f b6 c0                         i283 movzx
+      000004fb: 89 85 a0 fe ff ff                   i284 mov
+      00000501: 81 bd a0 fe ff ff 00 00 00 00       i285 cmp
+      0000050b: 0f 85 05 00 00 00 e9 1b 00 00 00    i286 branch b28, b29
+    b28 @0x00000516
+      00000516: b8 04 00 00 00                      i287 mov
+      0000051b: 89 85 98 fe ff ff                   i288 mov
+      00000521: 8b bd 98 fe ff ff                   i289 mov
+      00000527: e8 e4 fa ff ff                      i290 call f1
+      0000052c: e9 1b 00 00 00                      i291 jump b30
+    b29 @0x00000531
+      00000531: b8 00 00 00 00                      i292 mov
+      00000536: 89 85 90 fe ff ff                   i293 mov
+      0000053c: 8b bd 90 fe ff ff                   i294 mov
+      00000542: e8 c9 fa ff ff                      i295 call f1
+      00000547: e9 00 00 00 00                      i296 jump b30
+    b30 @0x0000054c
+      0000054c: 8b 45 f8                            i297 mov
+      0000054f: 89 85 88 fe ff ff                   i298 mov
+      00000555: b8 15 00 00 00                      i299 mov
+      0000055a: 89 85 80 fe ff ff                   i300 mov
+      00000560: 8b 85 88 fe ff ff                   i301 mov
+      00000566: 3b 85 80 fe ff ff                   i302 cmp
+      0000056c: 40 0f 9d c0                         i303 set
+      00000570: 40 0f b6 c0                         i304 movzx
+      00000574: 89 85 78 fe ff ff                   i305 mov
+      0000057a: 81 bd 78 fe ff ff 00 00 00 00       i306 cmp
+      00000584: 0f 85 05 00 00 00 e9 1b 00 00 00    i307 branch b31, b32
+    b31 @0x0000058f
+      0000058f: b8 05 00 00 00                      i308 mov
+      00000594: 89 85 70 fe ff ff                   i309 mov
+      0000059a: 8b bd 70 fe ff ff                   i310 mov
+      000005a0: e8 6b fa ff ff                      i311 call f1
+      000005a5: e9 1b 00 00 00                      i312 jump b33
+    b32 @0x000005aa
+      000005aa: b8 00 00 00 00                      i313 mov
+      000005af: 89 85 68 fe ff ff                   i314 mov
+      000005b5: 8b bd 68 fe ff ff                   i315 mov
+      000005bb: e8 50 fa ff ff                      i316 call f1
+      000005c0: e9 00 00 00 00                      i317 jump b33
+    b33 @0x000005c5
+      000005c5: b8 01 00 00 00                      i318 mov
+      000005ca: 89 85 60 fe ff ff                   i319 mov
+      000005d0: b8 01 00 00 00                      i320 mov
+      000005d5: 89 85 58 fe ff ff                   i321 mov
+      000005db: 8b 85 60 fe ff ff                   i322 mov
+      000005e1: 3b 85 58 fe ff ff                   i323 cmp
+      000005e7: 40 0f 94 c0                         i324 set
+      000005eb: 40 0f b6 c0                         i325 movzx
+      000005ef: 89 85 50 fe ff ff                   i326 mov
+      000005f5: 81 bd 50 fe ff ff 00 00 00 00       i327 cmp
+      000005ff: 0f 85 05 00 00 00 e9 1b 00 00 00    i328 branch b34, b35
+    b34 @0x0000060a
+      0000060a: b8 06 00 00 00                      i329 mov
+      0000060f: 89 85 48 fe ff ff                   i330 mov
+      00000615: 8b bd 48 fe ff ff                   i331 mov
+      0000061b: e8 f0 f9 ff ff                      i332 call f1
+      00000620: e9 1b 00 00 00                      i333 jump b36
+    b35 @0x00000625
+      00000625: b8 00 00 00 00                      i334 mov
+      0000062a: 89 85 40 fe ff ff                   i335 mov
+      00000630: 8b bd 40 fe ff ff                   i336 mov
+      00000636: e8 d5 f9 ff ff                      i337 call f1
+      0000063b: e9 00 00 00 00                      i338 jump b36
+    b36 @0x00000640
+      00000640: b8 25 00 00 00                      i339 mov
+      00000645: 89 85 38 fe ff ff                   i340 mov
+      0000064b: 8b 85 38 fe ff ff                   i341 mov
+      00000651: c9                                  i342 leave
+      00000652: c3                                  i343 return
+}
