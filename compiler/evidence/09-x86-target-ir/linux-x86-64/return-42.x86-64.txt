@@ -77,7 +77,7 @@ target x86-64-linux-system-v {
   }
   function f2 study_fn_0 [frame=16, entry=b14] {
     storage:
-      ir.v0 -> i32 [rbp-8]
+      ir.v0 -> width=32 [rbp-8]
     b14:
       push.i64 rbp
       mov.i64 rsp, rbp

@@ -77,21 +77,21 @@ target x86-64-linux-system-v {
   }
   function f2 study_fn_0 [frame=128, entry=b14] {
     storage:
-      ir.s0 -> i32 [rbp-8]
-      ir.s1 -> i32 [rbp-16]
-      ir.s2 -> i32 [rbp-24]
-      ir.v0 -> i32 [rbp-32]
-      ir.v1 -> i32 [rbp-40]
-      ir.v2 -> i32 [rbp-48]
-      ir.v3 -> i32 [rbp-56]
-      ir.v4 -> i32 [rbp-64]
-      ir.v5 -> i32 [rbp-72]
-      ir.v6 -> i32 [rbp-80]
-      ir.v7 -> i32 [rbp-88]
-      ir.v8 -> i32 [rbp-96]
-      ir.v9 -> i32 [rbp-104]
-      ir.v10 -> i32 [rbp-112]
-      ir.v11 -> i32 [rbp-120]
+      ir.s0 -> width=32 [rbp-8]
+      ir.s1 -> width=32 [rbp-16]
+      ir.s2 -> width=32 [rbp-24]
+      ir.v0 -> width=32 [rbp-32]
+      ir.v1 -> width=32 [rbp-40]
+      ir.v2 -> width=32 [rbp-48]
+      ir.v3 -> width=32 [rbp-56]
+      ir.v4 -> width=32 [rbp-64]
+      ir.v5 -> width=32 [rbp-72]
+      ir.v6 -> width=32 [rbp-80]
+      ir.v7 -> width=32 [rbp-88]
+      ir.v8 -> width=32 [rbp-96]
+      ir.v9 -> width=32 [rbp-104]
+      ir.v10 -> width=32 [rbp-112]
+      ir.v11 -> width=32 [rbp-120]
     b14:
       push.i64 rbp
       mov.i64 rsp, rbp
@@ -147,11 +147,11 @@ target x86-64-linux-system-v {
   }
   function f3 study_fn_1 [frame=48, entry=b18] {
     storage:
-      ir.s3 -> i32 [rbp-8]
-      ir.v12 -> i32 [rbp-16]
-      ir.v13 -> i32 [rbp-24]
-      ir.v14 -> i32 [rbp-32]
-      ir.v15 -> i32 [rbp-40]
+      ir.s3 -> width=32 [rbp-8]
+      ir.v12 -> width=32 [rbp-16]
+      ir.v13 -> width=32 [rbp-24]
+      ir.v14 -> width=32 [rbp-32]
+      ir.v15 -> width=32 [rbp-40]
     b18:
       push.i64 rbp
       mov.i64 rsp, rbp

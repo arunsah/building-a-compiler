@@ -1,13 +1,13 @@
 a9825164af4cfbc4cbdbb180ef5ca5f1fc6e94f58813c4ed37ddd58679f976ad  ./commands.txt
-edaa82219eaaf3b40bdf865afb1a1428feedfd064d38faf111a23dca5163aed8  ./environment.txt
+d2e03f275feb26eb8dae06f19ae43c532f20d089d12220d2ee2652c962e44f32  ./environment.txt
 8e08dd8cd267fbd2b0a66e1c3001ac65a72f9b956cf32b9a7af3ecb70ef79d1d  ./native-results.txt
 7e0288c7904a35bcfb53aac414a7926fe0c1f0c6de6e6c591a611ed2c46d6c8e  ./operations.interpreter-output.txt
 c28514e3d45a0d7dfe1895dc3e034211fb86b29d84e86c0606b11839bada3fd2  ./operations.s
-8565a79deb5d116d0e41424c2d5f914cd9a317f714852f98bdd59d8c1f15d460  ./operations.x86-64.txt
+5c36fac24b4a8d8c62d5cab33b2d8082fbfe8b0aae3a1fa793d27fe7dfb942ec  ./operations.x86-64.txt
 aa23798239cbfeca6b26b0d6fa04cfd2ef980be2a47af5065aa2739bd5969ea9  ./return-42.s
-6d5e5761caba5fd3a59d17019f6e4c19ebdac2a2c81aeabf350d74b9a9f8749a  ./return-42.x86-64.txt
+0fb424908c6e96f0a87f3357cd2c73beef1784fbcad90955f320090094bc416d  ./return-42.x86-64.txt
 fab29f5bb4479230b7736e87ea74b45e90f41d31328e3452b04d30d74de5c69d  ./sanitizers.txt
 4c82a221b575ce7fe118b2e8cdf0764bf4ef570a3017e80b6d3438af9095f376  ./sum-to.interpreter-output.txt
 746ce404799cbc4c6720c70cfeedd1889e0b7680a5c7680d4c40ed40b36b2f8d  ./sum-to.s
-33f226f675189b7baf5bd57e8084b063a958868d6e7781abd3ec5fca35c6c259  ./sum-to.x86-64.txt
+3dbc60f3f6b0e0190889e8ffa9d547bc91abba4004a411d8b0fdeef5853b7b89  ./sum-to.x86-64.txt
 30a8e0ab2a7e915126bfbc816adc3e1d97e92033c3991cb063d6d51aa655d570  ./tests.txt

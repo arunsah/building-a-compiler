@@ -2,7 +2,7 @@
 
 These records were generated on 29 October 2026 by
 `compiler/record-x86-target-evidence.sh` from source revision
-`2dfa383a06228899cf6e1b6637bf5372e076ad7f`.
+`4765b013acef2ba71b596f8604bbca43e07adb48`.
 
 | Record | What it establishes |
 | --- | --- |
