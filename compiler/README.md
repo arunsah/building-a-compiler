@@ -76,8 +76,8 @@ The earlier driver records remain under
 Arm64 and Debian Linux x86-64 records are under
 [`evidence/04-lexer`](evidence/04-lexer).
 
-The parser checkpoint will retain its own records under `evidence/05-parser`
-after review.
+The current parser records are under
+[`evidence/05-parser`](evidence/05-parser).
 
 ## Source ownership contract
 
