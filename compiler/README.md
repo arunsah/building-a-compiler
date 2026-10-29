@@ -87,8 +87,8 @@ Arm64 and Debian Linux x86-64 records are under
 The current parser records are under
 [`evidence/05-parser`](evidence/05-parser).
 
-The semantic-checker checkpoint will retain its own records under
-`evidence/06-checker` after review.
+The current semantic-checker records are under
+[`evidence/06-checker`](evidence/06-checker).
 
 ## Source ownership contract
 

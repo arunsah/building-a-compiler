@@ -1,0 +1,6 @@
+make BUILD_DIR=<temporary>/strict test
+make BUILD_DIR=<temporary>/sanitize \
+  CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
+  LDFLAGS='-fsanitize=address,undefined' test
+<temporary>/strict/studycc dump checked examples/return-42.study
+<temporary>/strict/studycc check examples/invalid/type-mismatch.study
