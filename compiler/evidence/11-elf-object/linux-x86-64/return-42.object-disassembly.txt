@@ -1,0 +1,89 @@
+
+/tmp/study-ch11-evidence/return-42.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <_start>:
+   0:	e8 00 00 00 00       	call   5 <_start+0x5>
+			1: R_X86_64_PC32	study_fn_0-0x4
+   5:	89 c7                	mov    edi,eax
+   7:	b8 3c 00 00 00       	mov    eax,0x3c
+   c:	0f 05                	syscall
+   e:	0f 0b                	ud2
+
+0000000000000010 <study_rt_print_i32>:
+  10:	55                   	push   rbp
+  11:	48 89 e5             	mov    rbp,rsp
+  14:	48 81 ec 40 00 00 00 	sub    rsp,0x40
+  1b:	45 31 c0             	xor    r8d,r8d
+  1e:	89 f8                	mov    eax,edi
+  20:	85 c0                	test   eax,eax
+  22:	0f 89 12 00 00 00    	jns    3a <study_rt_print_i32+0x2a>
+  28:	e9 00 00 00 00       	jmp    2d <study_rt_print_i32+0x1d>
+  2d:	41 b8 01 00 00 00    	mov    r8d,0x1
+  33:	f7 d8                	neg    eax
+  35:	e9 00 00 00 00       	jmp    3a <study_rt_print_i32+0x2a>
+  3a:	48 8d 75 ff          	lea    rsi,[rbp-0x1]
+  3e:	40 c6 06 0a          	rex mov BYTE PTR [rsi],0xa
+  42:	41 b9 01 00 00 00    	mov    r9d,0x1
+  48:	85 c0                	test   eax,eax
+  4a:	0f 85 14 00 00 00    	jne    64 <study_rt_print_i32+0x54>
+  50:	e9 00 00 00 00       	jmp    55 <study_rt_print_i32+0x45>
+  55:	48 ff ce             	dec    rsi
+  58:	40 c6 06 30          	rex mov BYTE PTR [rsi],0x30
+  5c:	49 ff c1             	inc    r9
+  5f:	e9 23 00 00 00       	jmp    87 <study_rt_print_i32+0x77>
+  64:	31 d2                	xor    edx,edx
+  66:	b9 0a 00 00 00       	mov    ecx,0xa
+  6b:	f7 f1                	div    ecx
+  6d:	40 80 c2 30          	rex add dl,0x30
+  71:	48 ff ce             	dec    rsi
+  74:	40 88 16             	rex mov BYTE PTR [rsi],dl
+  77:	49 ff c1             	inc    r9
+  7a:	85 c0                	test   eax,eax
+  7c:	0f 85 e2 ff ff ff    	jne    64 <study_rt_print_i32+0x54>
+  82:	e9 00 00 00 00       	jmp    87 <study_rt_print_i32+0x77>
+  87:	45 85 c0             	test   r8d,r8d
+  8a:	0f 84 14 00 00 00    	je     a4 <study_rt_print_i32+0x94>
+  90:	e9 00 00 00 00       	jmp    95 <study_rt_print_i32+0x85>
+  95:	48 ff ce             	dec    rsi
+  98:	40 c6 06 2d          	rex mov BYTE PTR [rsi],0x2d
+  9c:	49 ff c1             	inc    r9
+  9f:	e9 00 00 00 00       	jmp    a4 <study_rt_print_i32+0x94>
+  a4:	4c 89 ca             	mov    rdx,r9
+  a7:	e9 00 00 00 00       	jmp    ac <study_rt_print_i32+0x9c>
+  ac:	b8 01 00 00 00       	mov    eax,0x1
+  b1:	bf 01 00 00 00       	mov    edi,0x1
+  b6:	0f 05                	syscall
+  b8:	48 81 f8 fc ff ff ff 	cmp    rax,0xfffffffffffffffc
+  bf:	0f 84 e7 ff ff ff    	je     ac <study_rt_print_i32+0x9c>
+  c5:	e9 00 00 00 00       	jmp    ca <study_rt_print_i32+0xba>
+  ca:	48 85 c0             	test   rax,rax
+  cd:	0f 8e 1b 00 00 00    	jle    ee <study_rt_print_i32+0xde>
+  d3:	e9 00 00 00 00       	jmp    d8 <study_rt_print_i32+0xc8>
+  d8:	48 01 c6             	add    rsi,rax
+  db:	48 29 c2             	sub    rdx,rax
+  de:	48 85 d2             	test   rdx,rdx
+  e1:	0f 85 c5 ff ff ff    	jne    ac <study_rt_print_i32+0x9c>
+  e7:	e9 00 00 00 00       	jmp    ec <study_rt_print_i32+0xdc>
+  ec:	c9                   	leave
+  ed:	c3                   	ret
+  ee:	bf 4a 00 00 00       	mov    edi,0x4a
+  f3:	b8 3c 00 00 00       	mov    eax,0x3c
+  f8:	0f 05                	syscall
+  fa:	0f 0b                	ud2
+  fc:	90                   	nop
+  fd:	90                   	nop
+  fe:	90                   	nop
+  ff:	90                   	nop
+
+0000000000000100 <study_fn_0>:
+ 100:	55                   	push   rbp
+ 101:	48 89 e5             	mov    rbp,rsp
+ 104:	48 81 ec 10 00 00 00 	sub    rsp,0x10
+ 10b:	b8 2a 00 00 00       	mov    eax,0x2a
+ 110:	89 45 f8             	mov    DWORD PTR [rbp-0x8],eax
+ 113:	8b 45 f8             	mov    eax,DWORD PTR [rbp-0x8]
+ 116:	c9                   	leave
+ 117:	c3                   	ret

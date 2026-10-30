@@ -1,0 +1,18 @@
+elf64-relocatable x86-64 [bytes=1312, sections=7] {
+  header @0x00000000 section-headers=0x00000360
+  section s1 .text @0x00000040 size=495 align=16 flags=AX
+  section s2 .rela.text @0x00000230 entries=3 link=s3 info=s1
+  section s3 .symtab @0x00000278 entries=5 link=s4
+  section s4 .strtab @0x000002f0 size=49
+  section s5 .shstrtab @0x00000321 size=60
+  section s6 .note.GNU-stack size=0 flags=-
+  symbols:
+    sym4 _start global function .text+0x00000000 size=16
+    sym1 study_rt_print_i32 local function .text+0x00000010 size=236
+    sym2 study_fn_0 local function .text+0x00000100 size=166
+    sym3 study_fn_1 local function .text+0x000001b0 size=63
+  relocations:
+    rela0 .text+0x00000001 R_X86_64_PC32 study_fn_1 addend=-4 from=i0
+    rela1 .text+0x000001c7 R_X86_64_PC32 study_fn_0 addend=-4 from=i112
+    rela2 .text+0x000001de R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i119
+}

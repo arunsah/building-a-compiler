@@ -1,0 +1,12 @@
+recorded-utc=2026-10-30T03:19:49Z
+system=Linux
+release=6.12.113+deb13-amd64
+machine=x86_64
+source-revision=330d379b90dd8a04532e52a25754b23026ff2a39
+cc=cc (Debian 14.2.0-19) 14.2.0
+make=GNU Make 4.4.1
+assembler=/usr/bin/as
+object-wrapper=/usr/bin/objcopy
+linker=/usr/bin/ld
+elf-inspector=/usr/bin/readelf
+disassembler=/usr/bin/objdump

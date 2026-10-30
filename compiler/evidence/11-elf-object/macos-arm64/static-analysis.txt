@@ -1,0 +1,3 @@
+clang-static-analysis=passed
+command=scan-build --status-bugs make BUILD_DIR=<temporary> CC=clang
+reports=0

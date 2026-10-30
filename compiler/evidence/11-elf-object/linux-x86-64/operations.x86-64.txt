@@ -1,0 +1,481 @@
+target x86-64-linux-system-v {
+  function f0 _start [frame=0, entry=b0] {
+    b0:
+      call f4
+      mov.i32 eax, edi
+      mov.i32 #0x0000003c, eax
+      syscall
+      undefined
+  }
+  function f1 study_rt_print_i32 [frame=64, entry=b1] {
+    b1:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x40, rsp
+      xor.i32 r8d, r8d
+      mov.i32 edi, eax
+      test.i32 eax, eax
+      branch.not-sign b3, b2
+    b2:
+      mov.i32 #0x00000001, r8d
+      neg.i32 eax
+      jump b3
+    b3:
+      lea.i64 [rbp-1], rsi
+      mov.i8 #0xa, [rsi]
+      mov.i32 #0x00000001, r9d
+      test.i32 eax, eax
+      branch.not-equal b5, b4
+    b4:
+      dec.i64 rsi
+      mov.i8 #0x30, [rsi]
+      inc.i64 r9
+      jump b6
+    b5:
+      xor.i32 edx, edx
+      mov.i32 #0x0000000a, ecx
+      div.i32 ecx
+      add.i8 #0x30, dl
+      dec.i64 rsi
+      mov.i8 dl, [rsi]
+      inc.i64 r9
+      test.i32 eax, eax
+      branch.not-equal b5, b6
+    b6:
+      test.i32 r8d, r8d
+      branch.equal b8, b7
+    b7:
+      dec.i64 rsi
+      mov.i8 #0x2d, [rsi]
+      inc.i64 r9
+      jump b8
+    b8:
+      mov.i64 r9, rdx
+      jump b9
+    b9:
+      mov.i32 #0x00000001, eax
+      mov.i32 #0x00000001, edi
+      syscall
+      cmp.i64 #-4, rax
+      branch.equal b9, b10
+    b10:
+      test.i64 rax, rax
+      branch.less-equal b13, b11
+    b11:
+      add.i64 rax, rsi
+      sub.i64 rax, rdx
+      test.i64 rdx, rdx
+      branch.not-equal b9, b12
+    b12:
+      leave
+      return
+    b13:
+      mov.i32 #0x0000004a, edi
+      mov.i32 #0x0000003c, eax
+      syscall
+      undefined
+  }
+  function f2 study_fn_0 [frame=96, entry=b14] {
+    storage:
+      ir.s0 -> width=32 [rbp-8]
+      ir.v0 -> width=32 [rbp-16]
+      ir.v1 -> width=32 [rbp-24]
+      ir.v2 -> width=32 [rbp-32]
+      ir.v3 -> width=32 [rbp-40]
+      ir.v4 -> width=32 [rbp-48]
+      ir.v5 -> width=32 [rbp-56]
+      ir.v6 -> width=32 [rbp-64]
+      ir.v7 -> width=32 [rbp-72]
+      ir.v8 -> width=32 [rbp-80]
+      ir.v9 -> width=32 [rbp-88]
+    b14:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x60, rsp
+      mov.i32 edi, [rbp-8]
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-16]
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-24]
+      mov.i32 [rbp-16], eax
+      cmp.i32 [rbp-24], eax
+      set.equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-32]
+      cmp.i32 #0x00000000, [rbp-32]
+      branch.not-equal b15, b16
+    b15:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-40]
+      mov.i32 [rbp-40], eax
+      leave
+      return
+    b16:
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-48]
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-56]
+      mov.i32 [rbp-48], eax
+      sub.i32 [rbp-56], eax
+      mov.i32 eax, [rbp-64]
+      mov.i32 [rbp-64], edi
+      call f2
+      mov.i32 eax, [rbp-72]
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-80]
+      mov.i32 [rbp-72], eax
+      add.i32 [rbp-80], eax
+      mov.i32 eax, [rbp-88]
+      mov.i32 [rbp-88], eax
+      leave
+      return
+  }
+  function f3 study_fn_1 [frame=144, entry=b17] {
+    storage:
+      ir.s1 -> width=32 [rbp-8]
+      ir.s2 -> width=32 [rbp-16]
+      ir.s3 -> width=32 [rbp-24]
+      ir.s4 -> width=32 [rbp-32]
+      ir.s5 -> width=32 [rbp-40]
+      ir.s6 -> width=32 [rbp-48]
+      ir.v10 -> width=32 [rbp-56]
+      ir.v11 -> width=32 [rbp-64]
+      ir.v12 -> width=32 [rbp-72]
+      ir.v13 -> width=32 [rbp-80]
+      ir.v14 -> width=32 [rbp-88]
+      ir.v15 -> width=32 [rbp-96]
+      ir.v16 -> width=32 [rbp-104]
+      ir.v17 -> width=32 [rbp-112]
+      ir.v18 -> width=32 [rbp-120]
+      ir.v19 -> width=32 [rbp-128]
+      ir.v20 -> width=32 [rbp-136]
+    b17:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x90, rsp
+      mov.i32 edi, [rbp-8]
+      mov.i32 esi, [rbp-16]
+      mov.i32 edx, [rbp-24]
+      mov.i32 ecx, [rbp-32]
+      mov.i32 r8d, [rbp-40]
+      mov.i32 r9d, [rbp-48]
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-56]
+      mov.i32 [rbp-16], eax
+      mov.i32 eax, [rbp-64]
+      mov.i32 [rbp-56], eax
+      add.i32 [rbp-64], eax
+      mov.i32 eax, [rbp-72]
+      mov.i32 [rbp-24], eax
+      mov.i32 eax, [rbp-80]
+      mov.i32 [rbp-72], eax
+      add.i32 [rbp-80], eax
+      mov.i32 eax, [rbp-88]
+      mov.i32 [rbp-32], eax
+      mov.i32 eax, [rbp-96]
+      mov.i32 [rbp-88], eax
+      add.i32 [rbp-96], eax
+      mov.i32 eax, [rbp-104]
+      mov.i32 [rbp-40], eax
+      mov.i32 eax, [rbp-112]
+      mov.i32 [rbp-104], eax
+      add.i32 [rbp-112], eax
+      mov.i32 eax, [rbp-120]
+      mov.i32 [rbp-48], eax
+      mov.i32 eax, [rbp-128]
+      mov.i32 [rbp-120], eax
+      add.i32 [rbp-128], eax
+      mov.i32 eax, [rbp-136]
+      mov.i32 [rbp-136], eax
+      leave
+      return
+  }
+  function f4 study_fn_2 [frame=464, entry=b18] {
+    storage:
+      ir.s7 -> width=32 [rbp-8]
+      ir.s8 -> width=32 [rbp-16]
+      ir.s9 -> width=32 [rbp-24]
+      ir.v21 -> width=32 [rbp-32]
+      ir.v22 -> width=32 [rbp-40]
+      ir.v23 -> width=32 [rbp-48]
+      ir.v24 -> width=32 [rbp-56]
+      ir.v25 -> width=32 [rbp-64]
+      ir.v26 -> width=32 [rbp-72]
+      ir.v27 -> width=32 [rbp-80]
+      ir.v28 -> width=32 [rbp-88]
+      ir.v29 -> width=32 [rbp-96]
+      ir.v30 -> width=32 [rbp-104]
+      ir.v31 -> width=32 [rbp-112]
+      ir.v32 -> width=32 [rbp-120]
+      ir.v33 -> width=32 [rbp-128]
+      ir.v34 -> width=32 [rbp-136]
+      ir.v35 -> width=32 [rbp-144]
+      ir.v36 -> width=32 [rbp-152]
+      ir.v37 -> width=32 [rbp-160]
+      ir.v38 -> width=32 [rbp-168]
+      ir.v39 -> width=32 [rbp-176]
+      ir.v40 -> width=32 [rbp-184]
+      ir.v41 -> width=32 [rbp-192]
+      ir.v42 -> width=32 [rbp-200]
+      ir.v43 -> width=32 [rbp-208]
+      ir.v44 -> width=32 [rbp-216]
+      ir.v45 -> width=32 [rbp-224]
+      ir.v46 -> width=32 [rbp-232]
+      ir.v47 -> width=32 [rbp-240]
+      ir.v48 -> width=32 [rbp-248]
+      ir.v49 -> width=32 [rbp-256]
+      ir.v50 -> width=32 [rbp-264]
+      ir.v51 -> width=32 [rbp-272]
+      ir.v52 -> width=32 [rbp-280]
+      ir.v53 -> width=32 [rbp-288]
+      ir.v54 -> width=32 [rbp-296]
+      ir.v55 -> width=32 [rbp-304]
+      ir.v56 -> width=32 [rbp-312]
+      ir.v57 -> width=32 [rbp-320]
+      ir.v58 -> width=32 [rbp-328]
+      ir.v59 -> width=32 [rbp-336]
+      ir.v60 -> width=32 [rbp-344]
+      ir.v61 -> width=32 [rbp-352]
+      ir.v62 -> width=32 [rbp-360]
+      ir.v63 -> width=32 [rbp-368]
+      ir.v64 -> width=32 [rbp-376]
+      ir.v65 -> width=32 [rbp-384]
+      ir.v66 -> width=32 [rbp-392]
+      ir.v67 -> width=32 [rbp-400]
+      ir.v68 -> width=32 [rbp-408]
+      ir.v69 -> width=32 [rbp-416]
+      ir.v70 -> width=32 [rbp-424]
+      ir.v71 -> width=32 [rbp-432]
+      ir.v72 -> width=32 [rbp-440]
+      ir.v73 -> width=32 [rbp-448]
+      ir.v74 -> width=32 [rbp-456]
+    b18:
+      push.i64 rbp
+      mov.i64 rsp, rbp
+      sub.i64 #0x1d0, rsp
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-32]
+      mov.i32 #0x00000002, eax
+      mov.i32 eax, [rbp-40]
+      mov.i32 #0x00000003, eax
+      mov.i32 eax, [rbp-48]
+      mov.i32 #0x00000004, eax
+      mov.i32 eax, [rbp-56]
+      mov.i32 #0x00000005, eax
+      mov.i32 eax, [rbp-64]
+      mov.i32 #0x00000006, eax
+      mov.i32 eax, [rbp-72]
+      mov.i32 [rbp-32], edi
+      mov.i32 [rbp-40], esi
+      mov.i32 [rbp-48], edx
+      mov.i32 [rbp-56], ecx
+      mov.i32 [rbp-64], r8d
+      mov.i32 [rbp-72], r9d
+      call f3
+      mov.i32 eax, [rbp-80]
+      mov.i32 [rbp-80], eax
+      mov.i32 eax, [rbp-8]
+      mov.i32 #0x00000006, eax
+      mov.i32 eax, [rbp-88]
+      mov.i32 #0x00000007, eax
+      mov.i32 eax, [rbp-96]
+      mov.i32 [rbp-88], eax
+      imul.i32 [rbp-96], eax
+      mov.i32 eax, [rbp-104]
+      mov.i32 #0x00000002, eax
+      mov.i32 eax, [rbp-112]
+      mov.i32 [rbp-104], eax
+      sub.i32 [rbp-112], eax
+      mov.i32 eax, [rbp-120]
+      mov.i32 [rbp-120], eax
+      mov.i32 eax, [rbp-16]
+      mov.i32 #0x7fffffff, eax
+      mov.i32 eax, [rbp-128]
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-136]
+      mov.i32 [rbp-128], eax
+      add.i32 [rbp-136], eax
+      mov.i32 eax, [rbp-144]
+      mov.i32 [rbp-144], eax
+      mov.i32 eax, [rbp-24]
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-152]
+      mov.i32 [rbp-152], edi
+      call f1
+      mov.i32 [rbp-16], eax
+      mov.i32 eax, [rbp-160]
+      mov.i32 [rbp-160], edi
+      call f1
+      mov.i32 [rbp-24], eax
+      mov.i32 eax, [rbp-168]
+      mov.i32 [rbp-168], edi
+      call f1
+      mov.i32 #0x00000007, eax
+      mov.i32 eax, [rbp-176]
+      mov.i32 [rbp-176], eax
+      neg.i32 eax
+      mov.i32 eax, [rbp-184]
+      mov.i32 [rbp-184], edi
+      call f1
+      mov.i32 #0x00000005, eax
+      mov.i32 eax, [rbp-192]
+      mov.i32 [rbp-192], edi
+      call f2
+      mov.i32 eax, [rbp-200]
+      mov.i32 [rbp-200], edi
+      call f1
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-208]
+      mov.i32 #0x00000015, eax
+      mov.i32 eax, [rbp-216]
+      mov.i32 [rbp-208], eax
+      cmp.i32 [rbp-216], eax
+      set.not-equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-224]
+      cmp.i32 #0x00000000, [rbp-224]
+      set.equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-232]
+      cmp.i32 #0x00000000, [rbp-232]
+      branch.not-equal b19, b20
+    b19:
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-240]
+      mov.i32 [rbp-240], edi
+      call f1
+      jump b21
+    b20:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-248]
+      mov.i32 [rbp-248], edi
+      call f1
+      jump b21
+    b21:
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-256]
+      mov.i32 #0x00000016, eax
+      mov.i32 eax, [rbp-264]
+      mov.i32 [rbp-256], eax
+      cmp.i32 [rbp-264], eax
+      set.less al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-272]
+      cmp.i32 #0x00000000, [rbp-272]
+      branch.not-equal b22, b23
+    b22:
+      mov.i32 #0x00000002, eax
+      mov.i32 eax, [rbp-280]
+      mov.i32 [rbp-280], edi
+      call f1
+      jump b24
+    b23:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-288]
+      mov.i32 [rbp-288], edi
+      call f1
+      jump b24
+    b24:
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-296]
+      mov.i32 #0x00000015, eax
+      mov.i32 eax, [rbp-304]
+      mov.i32 [rbp-296], eax
+      cmp.i32 [rbp-304], eax
+      set.less-equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-312]
+      cmp.i32 #0x00000000, [rbp-312]
+      branch.not-equal b25, b26
+    b25:
+      mov.i32 #0x00000003, eax
+      mov.i32 eax, [rbp-320]
+      mov.i32 [rbp-320], edi
+      call f1
+      jump b27
+    b26:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-328]
+      mov.i32 [rbp-328], edi
+      call f1
+      jump b27
+    b27:
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-336]
+      mov.i32 #0x00000014, eax
+      mov.i32 eax, [rbp-344]
+      mov.i32 [rbp-336], eax
+      cmp.i32 [rbp-344], eax
+      set.greater al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-352]
+      cmp.i32 #0x00000000, [rbp-352]
+      branch.not-equal b28, b29
+    b28:
+      mov.i32 #0x00000004, eax
+      mov.i32 eax, [rbp-360]
+      mov.i32 [rbp-360], edi
+      call f1
+      jump b30
+    b29:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-368]
+      mov.i32 [rbp-368], edi
+      call f1
+      jump b30
+    b30:
+      mov.i32 [rbp-8], eax
+      mov.i32 eax, [rbp-376]
+      mov.i32 #0x00000015, eax
+      mov.i32 eax, [rbp-384]
+      mov.i32 [rbp-376], eax
+      cmp.i32 [rbp-384], eax
+      set.greater-equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-392]
+      cmp.i32 #0x00000000, [rbp-392]
+      branch.not-equal b31, b32
+    b31:
+      mov.i32 #0x00000005, eax
+      mov.i32 eax, [rbp-400]
+      mov.i32 [rbp-400], edi
+      call f1
+      jump b33
+    b32:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-408]
+      mov.i32 [rbp-408], edi
+      call f1
+      jump b33
+    b33:
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-416]
+      mov.i32 #0x00000001, eax
+      mov.i32 eax, [rbp-424]
+      mov.i32 [rbp-416], eax
+      cmp.i32 [rbp-424], eax
+      set.equal al
+      movzx.i8.i32 al, eax
+      mov.i32 eax, [rbp-432]
+      cmp.i32 #0x00000000, [rbp-432]
+      branch.not-equal b34, b35
+    b34:
+      mov.i32 #0x00000006, eax
+      mov.i32 eax, [rbp-440]
+      mov.i32 [rbp-440], edi
+      call f1
+      jump b36
+    b35:
+      mov.i32 #0x00000000, eax
+      mov.i32 eax, [rbp-448]
+      mov.i32 [rbp-448], edi
+      call f1
+      jump b36
+    b36:
+      mov.i32 #0x00000025, eax
+      mov.i32 eax, [rbp-456]
+      mov.i32 [rbp-456], eax
+      leave
+      return
+  }
+}

@@ -1,0 +1,27 @@
+make BUILD_DIR=<temporary>/strict test
+make BUILD_DIR=<temporary>/sanitize \\
+  CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
+  LDFLAGS='-fsanitize=address,undefined' test
+<temporary>/strict/studycc dump encoding examples/return-42.study
+<temporary>/strict/studycc dump elf examples/return-42.study
+<temporary>/strict/studycc emit bin examples/return-42.study > return-42.bin
+<temporary>/strict/studycc emit obj examples/return-42.study > return-42.o
+<temporary>/strict/studycc emit asm examples/return-42.study > return-42.s
+<temporary>/strict/studycc dump encoding examples/sum-to.study
+<temporary>/strict/studycc dump elf examples/sum-to.study
+<temporary>/strict/studycc emit bin examples/sum-to.study > sum-to.bin
+<temporary>/strict/studycc emit obj examples/sum-to.study > sum-to.o
+<temporary>/strict/studycc emit asm examples/sum-to.study > sum-to.s
+<temporary>/strict/studycc dump encoding examples/operations.study
+<temporary>/strict/studycc dump elf examples/operations.study
+<temporary>/strict/studycc emit bin examples/operations.study > operations.bin
+<temporary>/strict/studycc emit obj examples/operations.study > operations.o
+<temporary>/strict/studycc emit asm examples/operations.study > operations.s
+<temporary>/strict/studycc interpret examples/sum-to.study
+<temporary>/strict/studycc interpret examples/operations.study
+<temporary>/strict/studycc build examples/PROGRAM.study -o <temporary>/PROGRAM.elf-writer
+<temporary>/strict/studycc build via-objcopy examples/PROGRAM.study -o <temporary>/PROGRAM.via-objcopy
+<temporary>/strict/studycc build via-asm examples/PROGRAM.study -o <temporary>/PROGRAM.via-asm
+readelf -h -S -s -r PROGRAM.o
+objdump -dr -Mintel PROGRAM.o
+readelf -h -l -S -s PROGRAM.elf-writer

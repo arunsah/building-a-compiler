@@ -1,0 +1,6 @@
+strict-warning-tests=passed
+elf-object-api-tests=passed
+serialized-object-verifier-tests=passed
+section-and-symbol-tests=passed
+call-relocation-tests=passed
+system-adapter-tests=passed

@@ -1,0 +1,37 @@
+elf64-relocatable x86-64 [bytes=2904, sections=7] {
+  header @0x00000000 section-headers=0x00000998
+  section s1 .text @0x00000040 size=1619 align=16 flags=AX
+  section s2 .rela.text @0x00000698 entries=21 link=s3 info=s1
+  section s3 .symtab @0x00000890 entries=6 link=s4
+  section s4 .strtab @0x00000920 size=60
+  section s5 .shstrtab @0x0000095c size=60
+  section s6 .note.GNU-stack size=0 flags=-
+  symbols:
+    sym5 _start global function .text+0x00000000 size=16
+    sym1 study_rt_print_i32 local function .text+0x00000010 size=236
+    sym2 study_fn_0 local function .text+0x00000100 size=132
+    sym3 study_fn_1 local function .text+0x00000190 size=123
+    sym4 study_fn_2 local function .text+0x00000210 size=1091
+  relocations:
+    rela0 .text+0x00000001 R_X86_64_PC32 study_fn_2 addend=-4 from=i0
+    rela1 .text+0x00000167 R_X86_64_PC32 study_fn_0 addend=-4 from=i86
+    rela2 .text+0x00000260 R_X86_64_PC32 study_fn_1 addend=-4 from=i156
+    rela3 .text+0x000002d9 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i186
+    rela4 .text+0x000002ed R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i190
+    rela5 .text+0x00000301 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i194
+    rela6 .text+0x00000325 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i201
+    rela7 .text+0x0000033b R_X86_64_PC32 study_fn_0 addend=-4 from=i205
+    rela8 .text+0x0000034c R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i208
+    rela9 .text+0x000003bd R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i227
+    rela10 .text+0x000003d8 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i232
+    rela11 .text+0x00000436 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i248
+    rela12 .text+0x00000451 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i253
+    rela13 .text+0x000004af R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i269
+    rela14 .text+0x000004ca R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i274
+    rela15 .text+0x00000528 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i290
+    rela16 .text+0x00000543 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i295
+    rela17 .text+0x000005a1 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i311
+    rela18 .text+0x000005bc R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i316
+    rela19 .text+0x0000061c R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i332
+    rela20 .text+0x00000637 R_X86_64_PC32 study_rt_print_i32 addend=-4 from=i337
+}

@@ -1,0 +1,10 @@
+native-execution=passed
+return-42-status=42
+sum-to-status=0
+operations-status=37
+interpreter-elf-writer-output=identical
+objcopy-reference-output=identical
+assembly-reference-output=identical
+linked-text-encoded-image=identical
+gnu-readelf-object-inspection=passed
+gnu-ld-relocation-consumption=passed
