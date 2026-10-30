@@ -45,12 +45,20 @@ grep -Fq 'studycc dump encoding INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump encoding'
 grep -Fq 'studycc dump elf INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump elf'
+grep -Fq 'studycc dump executable INPUT.study' \
+    "$temporary_directory/stdout" || \
+    fail '--help did not describe dump executable'
 grep -Fq 'studycc emit asm INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit asm'
 grep -Fq 'studycc emit bin INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit bin'
 grep -Fq 'studycc emit obj INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit obj'
+grep -Fq 'studycc emit exe INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe emit exe'
+grep -Fq 'studycc build via-ld INPUT.study -o OUTPUT' \
+    "$temporary_directory/stdout" || \
+    fail '--help did not describe the GNU ld reference path'
 grep -Fq 'studycc build INPUT.study -o OUTPUT' "$temporary_directory/stdout" || \
     fail '--help did not describe build'
 grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
@@ -185,6 +193,27 @@ test -s "$temporary_directory/stdout" || \
 test "$(od -An -tx1 -N4 "$temporary_directory/stdout" | tr -d ' \n')" = \
     7f454c46 || fail 'ELF object emission did not begin with ELF magic'
 
+expect_status 0 "$compiler" dump executable examples/return-42.study
+grep -Fq 'elf64-executable x86-64 [bytes=' \
+    "$temporary_directory/stdout" || \
+    fail 'executable dump did not identify the final ELF file'
+grep -Fq 'segment p0 LOAD' "$temporary_directory/stdout" || \
+    fail 'executable dump did not include the loadable segment'
+grep -Fq 'segment p1 GNU_STACK' "$temporary_directory/stdout" || \
+    fail 'executable dump did not include the stack contract'
+grep -Fq 'sym3 _start global function' "$temporary_directory/stdout" || \
+    fail 'executable dump did not include the final entry symbol'
+grep -Fq 'R_X86_64_PC32 study_fn_0' "$temporary_directory/stdout" || \
+    fail 'executable dump did not show the applied call relocation'
+
+expect_status 0 "$compiler" emit exe examples/return-42.study
+test -s "$temporary_directory/stdout" || \
+    fail 'ELF executable emission produced an empty file'
+test "$(od -An -tx1 -N4 "$temporary_directory/stdout" | tr -d ' \n')" = \
+    7f454c46 || fail 'ELF executable emission did not begin with ELF magic'
+test "$(od -An -tx1 -j16 -N2 "$temporary_directory/stdout" | tr -d ' \n')" = \
+    0200 || fail 'ELF executable emission is not ET_EXEC'
+
 expect_status 0 "$compiler" interpret examples/return-42.study
 test ! -s "$temporary_directory/stdout" || \
     fail 'return-only interpretation wrote unexpected program output'
@@ -194,6 +223,12 @@ test "$(cat "$temporary_directory/stdout")" = '55' || \
     fail 'sum-to interpretation did not print 55'
 test ! -s "$temporary_directory/stderr" || \
     fail 'successful interpretation wrote unexpected standard error'
+
+standalone_executable="$temporary_directory/standalone-return-42"
+expect_status 0 env PATH=/nonexistent "$compiler" build \
+    examples/return-42.study -o "$standalone_executable"
+test -x "$standalone_executable" || \
+    fail 'tool-free build did not publish an executable file'
 
 missing_path="$temporary_directory/missing.study"
 expect_status 1 "$compiler" dump source "$missing_path"
@@ -256,6 +291,7 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     operations_executable="$temporary_directory/operations"
     sum_via_assembly="$temporary_directory/sum-to-via-assembly"
     sum_via_objcopy="$temporary_directory/sum-to-via-objcopy"
+    sum_via_ld="$temporary_directory/sum-to-via-ld"
     linker_only_executable="$temporary_directory/return-42-linker-only"
     adapter_directory="$temporary_directory/linker-only-tools"
     preserved_output="$temporary_directory/preserved-output"
@@ -267,7 +303,7 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     test "$(cat "$preserved_output")" = 'keep this output' || \
         fail 'failed build changed the earlier output'
 
-    expect_status 1 env PATH=/nonexistent "$compiler" build \
+    expect_status 1 env PATH=/nonexistent "$compiler" build via-ld \
         examples/return-42.study -o "$preserved_output"
     grep -Fq 'system ld adapter exited with status 127' \
         "$temporary_directory/stderr" || \
@@ -277,7 +313,7 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
 
     mkdir "$adapter_directory"
     ln -s "$(command -v ld)" "$adapter_directory/ld"
-    expect_status 0 env PATH="$adapter_directory" "$compiler" build \
+    expect_status 0 env PATH="$adapter_directory" "$compiler" build via-ld \
         examples/return-42.study -o "$linker_only_executable"
     expect_status 42 "$linker_only_executable"
 
@@ -317,6 +353,12 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     test "$(cat "$temporary_directory/stdout")" = '55' || \
         fail 'reference objcopy path did not print 55'
 
+    expect_status 0 "$compiler" build via-ld \
+        examples/sum-to.study -o "$sum_via_ld"
+    expect_status 0 "$sum_via_ld"
+    test "$(cat "$temporary_directory/stdout")" = '55' || \
+        fail 'reference GNU ld path did not print 55'
+
     "$compiler" emit obj examples/return-42.study >"$emitted_object"
     readelf -h -S -s -r "$emitted_object" >"$temporary_directory/object-elf"
     grep -Fq 'Type:                              REL (Relocatable file)' \
@@ -342,6 +384,13 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     if readelf -l "$sum_executable" | grep -Fq 'INTERP'; then
         fail 'native output unexpectedly requires a dynamic interpreter'
     fi
+    readelf -lW "$sum_executable" >"$temporary_directory/program-headers"
+    grep -Eq 'LOAD +0x0+ +0x0*400000 +0x0*400000 .* R E +0x1000' \
+        "$temporary_directory/program-headers" || \
+        fail 'native output does not contain the expected RX load segment'
+    grep -Eq 'GNU_STACK .* RW +0x10' \
+        "$temporary_directory/program-headers" || \
+        fail 'native output does not request a non-executable stack'
 
     expect_status 0 "$compiler" build \
         examples/operations.study -o "$operations_executable"

@@ -9,9 +9,10 @@ The compiler is written in C17. **Study**, `.study`, and `studycc` are working
 names for the learning language, source files, and compiler command. The first
 milestone targets static Linux x86-64 ELF executables.
 
-## Current checkpoint: our first ELF64 object writer
+## Current checkpoint: a complete bounded native path
 
-The current commands expose every representation and the two execution paths:
+The current commands expose every representation and the default and reference
+execution paths:
 
 ```sh
 make -C compiler
@@ -23,14 +24,17 @@ make -C compiler
 ./compiler/build/studycc dump x86-64 compiler/examples/return-42.study
 ./compiler/build/studycc dump encoding compiler/examples/return-42.study
 ./compiler/build/studycc dump elf compiler/examples/return-42.study
+./compiler/build/studycc dump executable compiler/examples/return-42.study
 ./compiler/build/studycc emit asm compiler/examples/return-42.study
 ./compiler/build/studycc emit bin compiler/examples/return-42.study > /tmp/return-42.bin
 ./compiler/build/studycc emit obj compiler/examples/return-42.study > /tmp/return-42.o
+./compiler/build/studycc emit exe compiler/examples/return-42.study > /tmp/return-42
 ./compiler/build/studycc check compiler/examples/return-42.study
 ./compiler/build/studycc interpret compiler/examples/sum-to.study
 ```
 
-On Debian Linux x86-64 with GNU `objcopy` and `ld`:
+The default build does not require an assembler, object wrapper, linker, C
+library, or another system binary tool:
 
 ```sh
 ./compiler/build/studycc build compiler/examples/sum-to.study -o /tmp/sum-to
@@ -117,26 +121,39 @@ array, checks their links and ranges, compares `.text` with the encoded image
 apart from relocation fields, and checks every function symbol and call
 relocation before the object can be published.
 
+`dump executable` shows the final static ELF64 x86-64 file. The bounded linker
+accepts only the exact single-`.text` object shape produced by this compiler.
+It assigns `.text` the virtual address `0x401000`, gives every function symbol
+its final address, applies every `R_X86_64_PC32` call relocation, chooses
+`_start` as the entry, and writes an RX `PT_LOAD` segment together with a
+non-executable `PT_GNU_STACK` contract. `emit exe` writes those verified bytes
+without invoking GNU `ld`.
+
+The executable keeps `.text`, `.symtab`, `.strtab`, and `.shstrtab` sections so
+that the final code and function addresses remain inspectable. The Linux loader
+uses the program headers rather than these section headers to create the
+process image.
+
 The assembly includes `_start` and a small `print(i32)` runtime. `_start` calls
 Study `main` and invokes the Linux `exit` system call with its result. The
 runtime converts the complete signed value to decimal bytes and writes them
 through the Linux `write` system call. It does not use libc or a dynamic
 loader.
 
-`build` encodes the instructions and writes the ELF object itself. GNU `ld` is
-the only remaining system tool in the default path, and it produces the static
-executable from our object. The earlier GNU binary wrapper and assembly paths
-remain available as `build via-objcopy` and `build via-asm` for comparison.
-No reference path is selected silently. All paths invoke tools through argument
-arrays rather than shell commands, and they rename a successful executable
-into place only after every step succeeds. A failed compilation leaves an
-earlier output unchanged.
+`build` now writes and atomically publishes our complete executable. The GNU
+linker path remains available as `build via-ld`; the earlier binary-wrapper and
+assembly paths remain available as `build via-objcopy` and `build via-asm`.
+No reference path is selected silently. The default path works with an empty
+`PATH`. Reference paths invoke tools through argument arrays rather than shell
+commands. Every path renames a successful executable into place only after all
+of its steps succeed, so a failed compilation leaves an earlier output
+unchanged.
 
-This is still a temporary native path, not the final backend. The system
-assembler and object wrapper are no longer part of the default path. GNU `ld`
-remains a visible dependency. The next checkpoint will replace it with our own
-bounded linker while keeping the target program, encoded image, and
-relocatable object as inspectable boundaries.
+This completes the first bounded native path. It is not a general linker. It
+does not combine multiple objects, search archives, resolve undefined library
+symbols, create dynamic-linking tables, or support another object format or
+processor. Those are later extensions rather than hidden parts of this
+milestone.
 
 ## Build and verify
 
@@ -158,11 +175,12 @@ interpreter tests cover lowering, typed values and slots, branches, loops,
 calls, recursion, signed comparisons, wraparound arithmetic, program output,
 the `main` result, target instruction selection and stack storage, assembly
 rendering, instruction encoding, relative fixups, ELF sections, strings,
-symbols, relocations, and deliberately corrupted IR, target programs, and ELF
-objects rejected by their verifiers. On Linux x86-64 with GNU binutils, the
-command tests inspect our relocatable object, build and run the default and two
-reference paths, compare native output with the interpreter, check non-zero
-Study results, and inspect the object and executable ELF records.
+symbols, relocations, executable segments, relocation application, and
+deliberately corrupted IR, target programs, ELF objects, and executables
+rejected by their verifiers. On Linux x86-64 with GNU binutils, the command
+tests independently inspect our object and executable, run the tool-free
+default path and all three reference paths, compare native output with the
+interpreter, and check non-zero Study results.
 
 To retain a small environment and verification record in a new directory:
 
@@ -200,6 +218,9 @@ The first instruction-encoding and relative-fixup records are under
 
 The ELF64 relocatable-object and call-relocation records are under
 [`evidence/11-elf-object`](evidence/11-elf-object).
+
+The bounded-linker and final executable records will be retained under
+`evidence/12-bounded-linker` after cross-host and native review.
 
 ## Source ownership contract
 
@@ -361,7 +382,30 @@ ranges and links, string and section-name tables, symbol binding and function
 ranges, `.text` bytes, and relocation records. A malformed object is rejected
 without replacing the caller's earlier output.
 
-## Temporary native-build contract
+## ELF64 executable ownership and verification contract
+
+`study_elf64_executable_build()` borrows the verified object, target program,
+and encoded image and writes into an initialised empty
+`StudyElf64Executable`. The bounded linker reads the serialized object records,
+requires every symbol to be defined in `.text`, and accepts only
+`R_X86_64_PC32` RELA records with the explicit `-4` addend produced by our
+object writer.
+
+The linker copies `.text`, calculates `S + A - P` for every call, checks the
+signed 32-bit result, and records each applied value. The resulting `ET_EXEC`
+file has one RX load segment containing the ELF header, program headers, and
+code. A zero-sized `PT_GNU_STACK` segment requests a readable and writable but
+non-executable process stack. The executable also retains adjusted function
+symbols and its section-name and symbol-name strings outside the loadable
+segment.
+
+The executable verifier reads the serialized header, program headers, section
+headers, symbol table, strings, and relocated `.text` back from the byte array.
+It independently recalculates every relocation and checks that `_start` names
+the entry address. A failed link or verification does not publish a partial
+file.
+
+## Native-build contract
 
 `study_x86_64_emit_assembly()` verifies the target program before writing GNU
 assembly.
@@ -378,10 +422,15 @@ succeed. Temporary assembly, object, and unfinished output files are removed
 on every return path.
 
 `study_build_with_elf_and_system_linker()` follows the same publication rule,
-but writes our ELF object and invokes only GNU `ld`. The explicitly named
-`study_build_with_objcopy_and_system_linker()` and assembly route remain
-reference paths. The system linker is temporary and remains separate from
-instruction encoding and object writing.
+but writes our ELF object and invokes only GNU `ld`. It is now the explicitly
+named `build via-ld` reference path. The objcopy and assembly routes remain
+separate references as well.
+
+`study_build_executable()` owns no temporary directory and invokes no external
+tool. It builds the encoded image, object, and executable in memory; writes the
+verified executable to a temporary file beside the requested output; marks it
+executable; and publishes it by rename. An unfinished file is removed on every
+failure path.
 
 The generated runtime treats Linux `write` failure as a process failure with
 status 74. The shell can observe only the platform's bounded process status,

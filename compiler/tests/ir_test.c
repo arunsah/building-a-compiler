@@ -2,6 +2,7 @@
 #include "study/checker.h"
 #include "study/diagnostic.h"
 #include "study/elf64.h"
+#include "study/elf64_executable.h"
 #include "study/interpreter.h"
 #include "study/ir.h"
 #include "study/ir_verify.h"
@@ -227,6 +228,37 @@ static void build_elf_fixture(
         &diagnostic
     ));
     assert(study_elf64_object_verify(
+        object,
+        x86,
+        image,
+        &fixture->source,
+        &diagnostic
+    ));
+    assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
+}
+
+static void build_executable_fixture(
+    IrFixture *fixture,
+    StudyX86Program *x86,
+    StudyX86Image *image,
+    StudyElf64Object *object,
+    StudyElf64Executable *executable
+) {
+    StudyDiagnostic diagnostic;
+
+    build_elf_fixture(fixture, x86, image, object);
+    study_elf64_executable_init(executable);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_elf64_executable_build(
+        object,
+        x86,
+        image,
+        &fixture->source,
+        executable,
+        &diagnostic
+    ));
+    assert(study_elf64_executable_verify(
+        executable,
         object,
         x86,
         image,
@@ -610,6 +642,174 @@ static void test_elf_object_rejects_nonempty_output_and_corruption(void) {
     ));
     assert(strstr(diagnostic.message, "header or sections") != NULL);
 
+    study_elf64_object_free(&object);
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_small_elf_executable_shape_and_dump(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    StudyElf64Executable executable;
+    StudyDiagnostic diagnostic;
+    FILE *stream;
+    char dump[8192];
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    build_executable_fixture(
+        &fixture,
+        &x86,
+        &image,
+        &object,
+        &executable
+    );
+    assert(executable.length > object.length);
+    assert(executable.bytes[0] == UINT8_C(0x7f));
+    assert(executable.bytes[1] == (unsigned char)'E');
+    assert(executable.bytes[2] == (unsigned char)'L');
+    assert(executable.bytes[3] == (unsigned char)'F');
+    assert(executable.bytes[16] == UINT8_C(2));
+    assert(executable.bytes[17] == UINT8_C(0));
+    assert(executable.base_address == UINT64_C(0x400000));
+    assert(executable.text_offset == 4096U);
+    assert(executable.text_address == UINT64_C(0x401000));
+    assert(executable.entry_address == executable.text_address);
+    assert(executable.program_header_count == 2U);
+    assert(executable.section_count == 5U);
+    assert(executable.symbol_count == object.symbol_count);
+    assert(executable.applied_relocation_count == object.relocation_count);
+    assert(executable.applied_relocation_count == 1U);
+    assert(executable.applied_relocations[0].text_offset == 1U);
+    assert(executable.applied_relocations[0].symbol_index == 2U);
+    assert(executable.applied_relocations[0].addend == -4);
+    assert(executable.applied_relocations[0].value == 251);
+    assert(memcmp(
+        &executable.bytes[executable.text_offset],
+        image.bytes,
+        image.length
+    ) == 0);
+
+    stream = tmpfile();
+    assert(stream != NULL);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_elf64_executable_dump(
+        stream,
+        &executable,
+        &object,
+        &x86,
+        &image,
+        &fixture.source,
+        &diagnostic
+    ));
+    read_stream(stream, dump, sizeof(dump));
+    assert(fclose(stream) == 0);
+    assert(strstr(dump, "elf64-executable x86-64") != NULL);
+    assert(strstr(dump, "segment p0 LOAD") != NULL);
+    assert(strstr(dump, "segment p1 GNU_STACK") != NULL);
+    assert(strstr(dump, "section s1 .text") != NULL);
+    assert(strstr(dump, "sym3 _start global function") != NULL);
+    assert(strstr(dump, "R_X86_64_PC32 study_fn_0") != NULL);
+    assert(strstr(dump, "value=251") != NULL);
+
+    study_elf64_executable_free(&executable);
+    study_elf64_object_free(&object);
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_elf_executable_applies_every_call_relocation(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    StudyElf64Executable executable;
+    size_t index;
+
+    lower_text(
+        &fixture,
+        "fn identity(value: i32) -> i32 { return value; }\n"
+        "fn main() -> i32 { print(identity(7)); return identity(9); }\n"
+    );
+    build_executable_fixture(
+        &fixture,
+        &x86,
+        &image,
+        &object,
+        &executable
+    );
+    assert(executable.applied_relocation_count >= 4U);
+    assert(executable.applied_relocation_count == object.relocation_count);
+    assert(memcmp(
+        &executable.bytes[executable.text_offset],
+        image.bytes,
+        image.length
+    ) == 0);
+    for (index = 0U;
+         index < executable.applied_relocation_count;
+         index++) {
+        size_t offset = executable.applied_relocations[index].text_offset;
+        assert(read_little_endian_i32(
+            &executable.bytes[executable.text_offset + offset]
+        ) == executable.applied_relocations[index].value);
+    }
+
+    study_elf64_executable_free(&executable);
+    study_elf64_object_free(&object);
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_elf_executable_rejects_nonempty_output_and_corruption(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    StudyElf64Executable executable;
+    StudyDiagnostic diagnostic;
+    size_t length;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    build_executable_fixture(
+        &fixture,
+        &x86,
+        &image,
+        &object,
+        &executable
+    );
+    length = executable.length;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_elf64_executable_build(
+        &object,
+        &x86,
+        &image,
+        &fixture.source,
+        &executable,
+        &diagnostic
+    ));
+    assert(executable.length == length);
+    assert(strstr(
+        diagnostic.message,
+        "initialised empty output"
+    ) != NULL);
+
+    executable.bytes[16] = 0U;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_elf64_executable_verify(
+        &executable,
+        &object,
+        &x86,
+        &image,
+        &fixture.source,
+        &diagnostic
+    ));
+    assert(strstr(diagnostic.message, "header or program headers") != NULL);
+
+    study_elf64_executable_free(&executable);
     study_elf64_object_free(&object);
     study_x86_64_image_free(&image);
     study_x86_64_program_free(&x86);
@@ -1002,6 +1202,9 @@ int main(void) {
     test_small_elf_object_shape_and_dump();
     test_elf_object_relocates_every_call();
     test_elf_object_rejects_nonempty_output_and_corruption();
+    test_small_elf_executable_shape_and_dump();
+    test_elf_executable_applies_every_call_relocation();
+    test_elf_executable_rejects_nonempty_output_and_corruption();
     test_x86_verifier_rejects_cross_function_branch();
     test_x86_verifier_rejects_storage_outside_frame();
     test_x86_verifier_rejects_unencodable_immediate();

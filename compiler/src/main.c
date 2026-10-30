@@ -3,6 +3,7 @@
 #include "study/checker.h"
 #include "study/diagnostic.h"
 #include "study/elf64.h"
+#include "study/elf64_executable.h"
 #include "study/interpreter.h"
 #include "study/ir.h"
 #include "study/lexer.h"
@@ -31,11 +32,14 @@ typedef enum StudyIrAction {
     STUDY_IR_ACTION_DUMP_X86_64,
     STUDY_IR_ACTION_DUMP_ENCODING,
     STUDY_IR_ACTION_DUMP_ELF,
+    STUDY_IR_ACTION_DUMP_EXECUTABLE,
     STUDY_IR_ACTION_EMIT_ASSEMBLY,
     STUDY_IR_ACTION_EMIT_BINARY,
     STUDY_IR_ACTION_EMIT_OBJECT,
+    STUDY_IR_ACTION_EMIT_EXECUTABLE,
     STUDY_IR_ACTION_INTERPRET,
-    STUDY_IR_ACTION_BUILD_ELF,
+    STUDY_IR_ACTION_BUILD_EXECUTABLE,
+    STUDY_IR_ACTION_BUILD_VIA_LD,
     STUDY_IR_ACTION_BUILD_VIA_OBJCOPY,
     STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY
 } StudyIrAction;
@@ -52,10 +56,13 @@ static void study_print_usage(FILE *stream) {
         "  studycc dump x86-64 INPUT.study\n"
         "  studycc dump encoding INPUT.study\n"
         "  studycc dump elf INPUT.study\n"
+        "  studycc dump executable INPUT.study\n"
         "  studycc emit asm INPUT.study\n"
         "  studycc emit bin INPUT.study\n"
         "  studycc emit obj INPUT.study\n"
+        "  studycc emit exe INPUT.study\n"
         "  studycc build INPUT.study -o OUTPUT\n"
+        "  studycc build via-ld INPUT.study -o OUTPUT\n"
         "  studycc build via-objcopy INPUT.study -o OUTPUT\n"
         "  studycc build via-asm INPUT.study -o OUTPUT\n"
         "  studycc check INPUT.study\n"
@@ -249,6 +256,7 @@ static int study_ir_path(
     StudyX86Program x86;
     StudyX86Image image;
     StudyElf64Object object;
+    StudyElf64Executable executable;
     StudyDiagnostic diagnostic;
     uint32_t main_result = 0U;
     int status = STUDY_EXIT_SUCCESS;
@@ -261,6 +269,7 @@ static int study_ir_path(
     study_x86_64_program_init(&x86);
     study_x86_64_image_init(&image);
     study_elf64_object_init(&object);
+    study_elf64_executable_init(&executable);
     study_diagnostic_clear(&diagnostic);
 
     if (!study_source_read(&source, path, &diagnostic) ||
@@ -286,10 +295,13 @@ static int study_ir_path(
     } else if ((action == STUDY_IR_ACTION_DUMP_X86_64 ||
                 action == STUDY_IR_ACTION_DUMP_ENCODING ||
                 action == STUDY_IR_ACTION_DUMP_ELF ||
+                action == STUDY_IR_ACTION_DUMP_EXECUTABLE ||
                 action == STUDY_IR_ACTION_EMIT_ASSEMBLY ||
                 action == STUDY_IR_ACTION_EMIT_BINARY ||
                 action == STUDY_IR_ACTION_EMIT_OBJECT ||
-                action == STUDY_IR_ACTION_BUILD_ELF ||
+                action == STUDY_IR_ACTION_EMIT_EXECUTABLE ||
+                action == STUDY_IR_ACTION_BUILD_EXECUTABLE ||
+                action == STUDY_IR_ACTION_BUILD_VIA_LD ||
                 action == STUDY_IR_ACTION_BUILD_VIA_OBJCOPY ||
                 action == STUDY_IR_ACTION_BUILD_VIA_ASSEMBLY) &&
                !study_lower_to_x86_64(
@@ -302,8 +314,10 @@ static int study_ir_path(
         status = STUDY_EXIT_INPUT_ERROR;
     } else if ((action == STUDY_IR_ACTION_DUMP_ENCODING ||
                 action == STUDY_IR_ACTION_DUMP_ELF ||
+                action == STUDY_IR_ACTION_DUMP_EXECUTABLE ||
                 action == STUDY_IR_ACTION_EMIT_BINARY ||
-                action == STUDY_IR_ACTION_EMIT_OBJECT) &&
+                action == STUDY_IR_ACTION_EMIT_OBJECT ||
+                action == STUDY_IR_ACTION_EMIT_EXECUTABLE) &&
                !study_x86_64_encode(
                    &x86,
                    &source,
@@ -313,12 +327,26 @@ static int study_ir_path(
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
     } else if ((action == STUDY_IR_ACTION_DUMP_ELF ||
-                action == STUDY_IR_ACTION_EMIT_OBJECT) &&
+                action == STUDY_IR_ACTION_DUMP_EXECUTABLE ||
+                action == STUDY_IR_ACTION_EMIT_OBJECT ||
+                action == STUDY_IR_ACTION_EMIT_EXECUTABLE) &&
                !study_elf64_object_build(
                    &x86,
                    &image,
                    &source,
                    &object,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if ((action == STUDY_IR_ACTION_DUMP_EXECUTABLE ||
+                action == STUDY_IR_ACTION_EMIT_EXECUTABLE) &&
+               !study_elf64_executable_build(
+                   &object,
+                   &x86,
+                   &image,
+                   &source,
+                   &executable,
                    &diagnostic
                )) {
         study_diagnostic_print(stderr, &diagnostic);
@@ -368,6 +396,18 @@ static int study_ir_path(
                )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_DUMP_EXECUTABLE &&
+               !study_elf64_executable_dump(
+                   stdout,
+                   &executable,
+                   &object,
+                   &x86,
+                   &image,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
     } else if (action == STUDY_IR_ACTION_EMIT_ASSEMBLY &&
                !study_x86_64_emit_assembly(
                    stdout,
@@ -397,6 +437,18 @@ static int study_ir_path(
                )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_EMIT_EXECUTABLE &&
+               !study_elf64_executable_write(
+                   stdout,
+                   &executable,
+                   &object,
+                   &x86,
+                   &image,
+                   &source,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
     } else if (action == STUDY_IR_ACTION_INTERPRET &&
                !study_ir_interpret(
                    &ir,
@@ -407,7 +459,16 @@ static int study_ir_path(
                )) {
         study_diagnostic_print(stderr, &diagnostic);
         status = STUDY_EXIT_INPUT_ERROR;
-    } else if (action == STUDY_IR_ACTION_BUILD_ELF &&
+    } else if (action == STUDY_IR_ACTION_BUILD_EXECUTABLE &&
+               !study_build_executable(
+                   &x86,
+                   &source,
+                   build_output,
+                   &diagnostic
+               )) {
+        study_diagnostic_print(stderr, &diagnostic);
+        status = STUDY_EXIT_INPUT_ERROR;
+    } else if (action == STUDY_IR_ACTION_BUILD_VIA_LD &&
                !study_build_with_elf_and_system_linker(
                    &x86,
                    &source,
@@ -437,6 +498,7 @@ static int study_ir_path(
     }
 
     (void)main_result;
+    study_elf64_executable_free(&executable);
     study_elf64_object_free(&object);
     study_x86_64_image_free(&image);
     study_x86_64_program_free(&x86);
@@ -501,6 +563,14 @@ int main(int argc, char **argv) {
         strcmp(argv[2], "elf") == 0) {
         return study_ir_path(argv[3], STUDY_IR_ACTION_DUMP_ELF, NULL);
     }
+    if (argc == 4 && strcmp(argv[1], "dump") == 0 &&
+        strcmp(argv[2], "executable") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_DUMP_EXECUTABLE,
+            NULL
+        );
+    }
 
     if (argc == 4 && strcmp(argv[1], "emit") == 0 &&
         strcmp(argv[2], "asm") == 0) {
@@ -528,6 +598,14 @@ int main(int argc, char **argv) {
             NULL
         );
     }
+    if (argc == 4 && strcmp(argv[1], "emit") == 0 &&
+        strcmp(argv[2], "exe") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_EMIT_EXECUTABLE,
+            NULL
+        );
+    }
 
     if (argc == 3 && strcmp(argv[1], "check") == 0) {
         return study_check_path(argv[2], false);
@@ -541,8 +619,18 @@ int main(int argc, char **argv) {
         strcmp(argv[3], "-o") == 0) {
         return study_ir_path(
             argv[2],
-            STUDY_IR_ACTION_BUILD_ELF,
+            STUDY_IR_ACTION_BUILD_EXECUTABLE,
             argv[4]
+        );
+    }
+
+    if (argc == 6 && strcmp(argv[1], "build") == 0 &&
+        strcmp(argv[2], "via-ld") == 0 &&
+        strcmp(argv[4], "-o") == 0) {
+        return study_ir_path(
+            argv[3],
+            STUDY_IR_ACTION_BUILD_VIA_LD,
+            argv[5]
         );
     }
 
