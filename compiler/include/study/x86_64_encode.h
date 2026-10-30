@@ -39,6 +39,13 @@ bool study_x86_64_encode(
     StudyDiagnostic *diagnostic
 );
 
+bool study_x86_64_image_verify(
+    const StudyX86Program *program,
+    const StudyX86Image *image,
+    const StudySource *source,
+    StudyDiagnostic *diagnostic
+);
+
 bool study_x86_64_image_dump(
     FILE *stream,
     const StudyX86Program *program,

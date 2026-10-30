@@ -43,10 +43,14 @@ grep -Fq 'studycc dump x86-64 INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump x86-64'
 grep -Fq 'studycc dump encoding INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe dump encoding'
+grep -Fq 'studycc dump elf INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe dump elf'
 grep -Fq 'studycc emit asm INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit asm'
 grep -Fq 'studycc emit bin INPUT.study' "$temporary_directory/stdout" || \
     fail '--help did not describe emit bin'
+grep -Fq 'studycc emit obj INPUT.study' "$temporary_directory/stdout" || \
+    fail '--help did not describe emit obj'
 grep -Fq 'studycc build INPUT.study -o OUTPUT' "$temporary_directory/stdout" || \
     fail '--help did not describe build'
 grep -Fq 'studycc check INPUT.study' "$temporary_directory/stdout" || \
@@ -163,6 +167,24 @@ test -s "$temporary_directory/stdout" || \
 test "$(od -An -tx1 -N1 "$temporary_directory/stdout" | tr -d ' ')" = e8 || \
     fail 'binary emission did not begin with a near call'
 
+expect_status 0 "$compiler" dump elf examples/return-42.study
+grep -Fq 'elf64-relocatable x86-64 [bytes=' \
+    "$temporary_directory/stdout" || \
+    fail 'ELF dump did not identify the relocatable object'
+grep -Fq 'section s2 .rela.text' "$temporary_directory/stdout" || \
+    fail 'ELF dump did not include the relocation section'
+grep -Fq 'sym3 _start global function' "$temporary_directory/stdout" || \
+    fail 'ELF dump did not include the entry symbol'
+grep -Fq 'R_X86_64_PC32 study_fn_0 addend=-4' \
+    "$temporary_directory/stdout" || \
+    fail 'ELF dump did not include the main call relocation'
+
+expect_status 0 "$compiler" emit obj examples/return-42.study
+test -s "$temporary_directory/stdout" || \
+    fail 'ELF object emission produced an empty file'
+test "$(od -An -tx1 -N4 "$temporary_directory/stdout" | tr -d ' \n')" = \
+    7f454c46 || fail 'ELF object emission did not begin with ELF magic'
+
 expect_status 0 "$compiler" interpret examples/return-42.study
 test ! -s "$temporary_directory/stdout" || \
     fail 'return-only interpretation wrote unexpected program output'
@@ -233,9 +255,11 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     sum_executable="$temporary_directory/sum-to"
     operations_executable="$temporary_directory/operations"
     sum_via_assembly="$temporary_directory/sum-to-via-assembly"
-    no_assembler_executable="$temporary_directory/return-42-no-assembler"
-    adapter_directory="$temporary_directory/encoded-path-tools"
+    sum_via_objcopy="$temporary_directory/sum-to-via-objcopy"
+    linker_only_executable="$temporary_directory/return-42-linker-only"
+    adapter_directory="$temporary_directory/linker-only-tools"
     preserved_output="$temporary_directory/preserved-output"
+    emitted_object="$temporary_directory/return-42.o"
 
     printf 'keep this output\n' >"$preserved_output"
     expect_status 1 "$compiler" build \
@@ -245,18 +269,23 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
 
     expect_status 1 env PATH=/nonexistent "$compiler" build \
         examples/return-42.study -o "$preserved_output"
-    grep -Fq 'system objcopy adapter exited with status 127' \
+    grep -Fq 'system ld adapter exited with status 127' \
         "$temporary_directory/stderr" || \
-        fail 'missing binary-object adapter was not reported'
+        fail 'missing linker adapter was not reported'
     test "$(cat "$preserved_output")" = 'keep this output' || \
-        fail 'binary-object adapter failure changed the earlier output'
+        fail 'linker adapter failure changed the earlier output'
 
     mkdir "$adapter_directory"
-    ln -s "$(command -v objcopy)" "$adapter_directory/objcopy"
     ln -s "$(command -v ld)" "$adapter_directory/ld"
     expect_status 0 env PATH="$adapter_directory" "$compiler" build \
-        examples/return-42.study -o "$no_assembler_executable"
-    expect_status 42 "$no_assembler_executable"
+        examples/return-42.study -o "$linker_only_executable"
+    expect_status 42 "$linker_only_executable"
+
+    expect_status 1 env PATH=/nonexistent "$compiler" build via-objcopy \
+        examples/return-42.study -o "$preserved_output"
+    grep -Fq 'system objcopy adapter exited with status 127' \
+        "$temporary_directory/stderr" || \
+        fail 'missing reference object wrapper was not reported'
 
     expect_status 1 env PATH=/nonexistent "$compiler" build via-asm \
         examples/return-42.study -o "$preserved_output"
@@ -281,6 +310,24 @@ if test "$(uname -s)" = Linux && test "$(uname -m)" = x86_64 &&
     expect_status 0 "$sum_via_assembly"
     test "$(cat "$temporary_directory/stdout")" = '55' || \
         fail 'reference assembly path did not print 55'
+
+    expect_status 0 "$compiler" build via-objcopy \
+        examples/sum-to.study -o "$sum_via_objcopy"
+    expect_status 0 "$sum_via_objcopy"
+    test "$(cat "$temporary_directory/stdout")" = '55' || \
+        fail 'reference objcopy path did not print 55'
+
+    "$compiler" emit obj examples/return-42.study >"$emitted_object"
+    readelf -h -S -s -r "$emitted_object" >"$temporary_directory/object-elf"
+    grep -Fq 'Type:                              REL (Relocatable file)' \
+        "$temporary_directory/object-elf" || \
+        fail 'our object is not ELF ET_REL'
+    grep -Fq '.rela.text' "$temporary_directory/object-elf" || \
+        fail 'our object has no .rela.text section'
+    grep -Fq 'R_X86_64_PC32' "$temporary_directory/object-elf" || \
+        fail 'our object has no PC-relative call relocation'
+    grep -Fq '_start' "$temporary_directory/object-elf" || \
+        fail 'our object has no _start symbol'
 
     readelf -h "$sum_executable" >"$temporary_directory/elf-header"
     grep -Fq 'Class:                             ELF64' \

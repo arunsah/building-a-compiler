@@ -1,6 +1,7 @@
 #include "study/checked.h"
 #include "study/checker.h"
 #include "study/diagnostic.h"
+#include "study/elf64.h"
 #include "study/interpreter.h"
 #include "study/ir.h"
 #include "study/ir_verify.h"
@@ -202,6 +203,34 @@ static void encode_x86_fixture(
         x86,
         &fixture->source,
         image,
+        &diagnostic
+    ));
+    assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
+}
+
+static void build_elf_fixture(
+    IrFixture *fixture,
+    StudyX86Program *x86,
+    StudyX86Image *image,
+    StudyElf64Object *object
+) {
+    StudyDiagnostic diagnostic;
+
+    encode_x86_fixture(fixture, x86, image);
+    study_elf64_object_init(object);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_elf64_object_build(
+        x86,
+        image,
+        &fixture->source,
+        object,
+        &diagnostic
+    ));
+    assert(study_elf64_object_verify(
+        object,
+        x86,
+        image,
+        &fixture->source,
         &diagnostic
     ));
     assert(diagnostic.kind == STUDY_DIAGNOSTIC_NONE);
@@ -438,6 +467,150 @@ static void test_x86_encoder_rejects_nonempty_output(void) {
     assert(image.length == length);
     assert(strstr(diagnostic.message, "initialised empty output image") != NULL);
 
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_small_elf_object_shape_and_dump(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    StudyDiagnostic diagnostic;
+    FILE *stream;
+    char dump[8192];
+    size_t relocation_offset;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    build_elf_fixture(&fixture, &x86, &image, &object);
+    assert(object.length > image.length);
+    assert(object.bytes[0] == UINT8_C(0x7f));
+    assert(object.bytes[1] == (unsigned char)'E');
+    assert(object.bytes[2] == (unsigned char)'L');
+    assert(object.bytes[3] == (unsigned char)'F');
+    assert(object.section_count == 7U);
+    assert(object.text_size == image.length);
+    assert(object.symbol_count == x86.function_count + 1U);
+    assert(object.relocation_count == 1U);
+    assert(object.function_symbol_indices[x86.start_function] ==
+           x86.function_count);
+    assert(object.function_symbol_indices[x86.print_function] == 1U);
+    assert(object.relocations[0].instruction == 0U);
+    assert(object.relocations[0].target_function == 2U);
+    assert(object.relocations[0].offset == 1U);
+    assert(object.relocations[0].addend == -4);
+    assert(object.bytes[object.text_offset] == UINT8_C(0xe8));
+    for (relocation_offset = 1U; relocation_offset < 5U;
+         relocation_offset++) {
+        assert(object.bytes[object.text_offset + relocation_offset] == 0U);
+    }
+    assert(memcmp(
+        &object.bytes[object.text_offset + 5U],
+        &image.bytes[5U],
+        image.length - 5U
+    ) == 0);
+
+    stream = tmpfile();
+    assert(stream != NULL);
+    study_diagnostic_clear(&diagnostic);
+    assert(study_elf64_object_dump(
+        stream,
+        &object,
+        &x86,
+        &image,
+        &fixture.source,
+        &diagnostic
+    ));
+    read_stream(stream, dump, sizeof(dump));
+    assert(fclose(stream) == 0);
+    assert(strstr(dump, "elf64-relocatable x86-64") != NULL);
+    assert(strstr(dump, "section s1 .text") != NULL);
+    assert(strstr(dump, "section s2 .rela.text") != NULL);
+    assert(strstr(dump, "sym3 _start global function") != NULL);
+    assert(strstr(
+        dump,
+        "R_X86_64_PC32 study_fn_0 addend=-4 from=i0"
+    ) != NULL);
+
+    study_elf64_object_free(&object);
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_elf_object_relocates_every_call(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    size_t call_count = 0U;
+    size_t index;
+
+    lower_text(
+        &fixture,
+        "fn identity(value: i32) -> i32 { return value; }\n"
+        "fn main() -> i32 { print(identity(7)); return identity(9); }\n"
+    );
+    build_elf_fixture(&fixture, &x86, &image, &object);
+    for (index = 0U; index < x86.instruction_count; index++) {
+        if (x86.instructions[index].opcode == STUDY_X86_CALL) {
+            call_count += 1U;
+        }
+    }
+    assert(call_count >= 4U);
+    assert(object.relocation_count == call_count);
+    for (index = 0U; index < object.relocation_count; index++) {
+        size_t offset = object.relocations[index].offset;
+
+        assert(offset > 0U);
+        assert(image.bytes[offset - 1U] == UINT8_C(0xe8));
+        assert(object.bytes[object.text_offset + offset] == 0U);
+        assert(object.bytes[object.text_offset + offset + 1U] == 0U);
+        assert(object.bytes[object.text_offset + offset + 2U] == 0U);
+        assert(object.bytes[object.text_offset + offset + 3U] == 0U);
+    }
+
+    study_elf64_object_free(&object);
+    study_x86_64_image_free(&image);
+    study_x86_64_program_free(&x86);
+    ir_fixture_free(&fixture);
+}
+
+static void test_elf_object_rejects_nonempty_output_and_corruption(void) {
+    IrFixture fixture;
+    StudyX86Program x86;
+    StudyX86Image image;
+    StudyElf64Object object;
+    StudyDiagnostic diagnostic;
+    size_t length;
+
+    lower_text(&fixture, "fn main() -> i32 { return 42; }\n");
+    build_elf_fixture(&fixture, &x86, &image, &object);
+    length = object.length;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_elf64_object_build(
+        &x86,
+        &image,
+        &fixture.source,
+        &object,
+        &diagnostic
+    ));
+    assert(object.length == length);
+    assert(strstr(diagnostic.message, "initialised empty output object") != NULL);
+
+    object.bytes[0] = 0U;
+    study_diagnostic_clear(&diagnostic);
+    assert(!study_elf64_object_verify(
+        &object,
+        &x86,
+        &image,
+        &fixture.source,
+        &diagnostic
+    ));
+    assert(strstr(diagnostic.message, "header or sections") != NULL);
+
+    study_elf64_object_free(&object);
     study_x86_64_image_free(&image);
     study_x86_64_program_free(&x86);
     ir_fixture_free(&fixture);
@@ -826,6 +999,9 @@ int main(void) {
     test_small_x86_encoding_and_dump();
     test_x86_encoder_covers_current_opcode_set();
     test_x86_encoder_rejects_nonempty_output();
+    test_small_elf_object_shape_and_dump();
+    test_elf_object_relocates_every_call();
+    test_elf_object_rejects_nonempty_output_and_corruption();
     test_x86_verifier_rejects_cross_function_branch();
     test_x86_verifier_rejects_storage_outside_frame();
     test_x86_verifier_rejects_unencodable_immediate();

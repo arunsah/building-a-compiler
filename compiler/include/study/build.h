@@ -21,11 +21,21 @@ bool study_build_with_system_tools(
 );
 
 /*
- * Encode instructions ourselves, wrap the flat image in a temporary ELF
- * object with GNU objcopy, and invoke GNU ld. The remaining object and linker
- * adapters are explicit boundaries for the next checkpoints.
+ * Encode instructions and write the ELF64 relocatable object ourselves, then
+ * invoke GNU ld as the one remaining default-path adapter.
  */
-bool study_build_with_encoder_and_system_linker(
+bool study_build_with_elf_and_system_linker(
+    const StudyX86Program *program,
+    const StudySource *source,
+    const char *output_path,
+    StudyDiagnostic *diagnostic
+);
+
+/*
+ * Reference path for comparing our ELF writer with the earlier GNU objcopy
+ * wrapper. This is never selected silently by the default build.
+ */
+bool study_build_with_objcopy_and_system_linker(
     const StudyX86Program *program,
     const StudySource *source,
     const char *output_path,

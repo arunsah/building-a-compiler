@@ -1196,6 +1196,29 @@ static bool study_x86_image_matches_program(
     return true;
 }
 
+bool study_x86_64_image_verify(
+    const StudyX86Program *program,
+    const StudyX86Image *image,
+    const StudySource *source,
+    StudyDiagnostic *diagnostic
+) {
+    study_diagnostic_clear(diagnostic);
+    if (source == NULL ||
+        !study_x86_64_verify(program, source, diagnostic) ||
+        !study_x86_image_matches_program(program, image)) {
+        if (diagnostic->kind == STUDY_DIAGNOSTIC_NONE) {
+            study_diagnostic_set(
+                diagnostic,
+                STUDY_DIAGNOSTIC_INTERNAL,
+                source != NULL ? source->path : NULL,
+                "x86-64 image does not match its target program"
+            );
+        }
+        return false;
+    }
+    return true;
+}
+
 bool study_x86_64_image_dump(
     FILE *stream,
     const StudyX86Program *program,
@@ -1206,9 +1229,8 @@ bool study_x86_64_image_dump(
     StudyX86FunctionId function_id;
 
     study_diagnostic_clear(diagnostic);
-    if (stream == NULL || source == NULL ||
-        !study_x86_64_verify(program, source, diagnostic) ||
-        !study_x86_image_matches_program(program, image)) {
+    if (stream == NULL ||
+        !study_x86_64_image_verify(program, image, source, diagnostic)) {
         if (diagnostic->kind == STUDY_DIAGNOSTIC_NONE) {
             study_diagnostic_set(
                 diagnostic,
