@@ -225,9 +225,6 @@ The ELF64 relocatable-object and call-relocation records are under
 The bounded-linker and final static-executable records are under
 [`evidence/12-bounded-linker`](evidence/12-bounded-linker).
 
-The bounded-linker and final executable records will be retained under
-`evidence/12-bounded-linker` after cross-host and native review.
-
 ## Source ownership contract
 
 `study_source_read()` reads bytes through a stream instead of assuming a
