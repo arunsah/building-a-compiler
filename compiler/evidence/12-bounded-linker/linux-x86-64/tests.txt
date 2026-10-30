@@ -1,0 +1,7 @@
+strict-warning-tests=passed
+bounded-linker-api-tests=passed
+serialized-executable-verifier-tests=passed
+program-header-and-section-tests=passed
+relocation-application-tests=passed
+tool-free-default-path-tests=passed
+system-reference-path-tests=passed

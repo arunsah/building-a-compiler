@@ -1,0 +1,12 @@
+native-execution=passed
+return-42-status=42
+sum-to-status=0
+operations-status=37
+default-path-system-binary-tools=none
+emitted-and-built-executable-bytes=identical
+interpreter-and-native-output=identical
+gnu-ld-reference-output=identical
+objcopy-reference-output=identical
+assembly-reference-output=identical
+linked-text-and-encoded-image=identical
+gnu-readelf-executable-inspection=passed

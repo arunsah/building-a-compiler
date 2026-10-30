@@ -1,0 +1,12 @@
+recorded-utc=2026-10-30T03:49:49Z
+system=Darwin
+release=25.6.0
+machine=arm64
+source-revision=6f7fc04410662a1fdcd9eeead4de3a93993914d7
+cc=Apple clang version 21.0.0 (clang-2100.1.1.101)
+make=GNU Make 3.81
+assembler=/usr/bin/as
+object-wrapper=unavailable
+linker=/usr/bin/ld
+elf-inspector=unavailable
+disassembler=/usr/bin/objdump

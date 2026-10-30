@@ -1,0 +1,22 @@
+make BUILD_DIR=<temporary>/strict test
+make BUILD_DIR=<temporary>/sanitize \\
+  CFLAGS='<strict flags> -fsanitize=address,undefined -fno-omit-frame-pointer' \
+  LDFLAGS='-fsanitize=address,undefined' test
+<temporary>/strict/studycc dump executable examples/return-42.study
+<temporary>/strict/studycc emit bin examples/return-42.study > return-42.text.bin
+<temporary>/strict/studycc emit exe examples/return-42.study > return-42.executable.bin
+<temporary>/strict/studycc dump executable examples/sum-to.study
+<temporary>/strict/studycc emit bin examples/sum-to.study > sum-to.text.bin
+<temporary>/strict/studycc emit exe examples/sum-to.study > sum-to.executable.bin
+<temporary>/strict/studycc dump executable examples/operations.study
+<temporary>/strict/studycc emit bin examples/operations.study > operations.text.bin
+<temporary>/strict/studycc emit exe examples/operations.study > operations.executable.bin
+<temporary>/strict/studycc interpret examples/sum-to.study
+<temporary>/strict/studycc interpret examples/operations.study
+PATH=/nonexistent <temporary>/strict/studycc build examples/PROGRAM.study -o <temporary>/PROGRAM.bounded
+<temporary>/strict/studycc build via-ld examples/PROGRAM.study -o <temporary>/PROGRAM.via-ld
+<temporary>/strict/studycc build via-objcopy examples/PROGRAM.study -o <temporary>/PROGRAM.via-objcopy
+<temporary>/strict/studycc build via-asm examples/PROGRAM.study -o <temporary>/PROGRAM.via-asm
+readelf -hW -lW -SW -sW PROGRAM.bounded
+objdump -d -Mintel PROGRAM.bounded
+objcopy -O binary --only-section=.text PROGRAM.bounded PROGRAM.linked-text.bin

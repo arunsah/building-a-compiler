@@ -1,0 +1,37 @@
+elf64-executable x86-64 [bytes=6280, entry=0x0000000000401000, segments=2, sections=5] {
+  header @0x00000000 program-headers=0x00000040 section-headers=0x00001748
+  segment p0 LOAD @0x00000000 vaddr=0x0000000000400000 filesz=5715 flags=RX align=4096
+  segment p1 GNU_STACK size=0 flags=RW align=16
+  section s1 .text @0x00001000 vaddr=0x0000000000401000 size=1619 align=16 flags=AX
+  section s2 .symtab @0x00001658 entries=6 link=s3
+  section s3 .strtab @0x000016e8 size=60
+  section s4 .shstrtab @0x00001724 size=33
+  symbols:
+    sym1 study_rt_print_i32 local function 0x0000000000401010 size=236
+    sym2 study_fn_0 local function 0x0000000000401100 size=132
+    sym3 study_fn_1 local function 0x0000000000401190 size=123
+    sym4 study_fn_2 local function 0x0000000000401210 size=1091
+    sym5 _start global function 0x0000000000401000 size=16
+  applied relocations:
+    rela0 .text+0x00000001 R_X86_64_PC32 study_fn_2 S=0x0000000000401210 A=-4 P=0x0000000000401001 value=523
+    rela1 .text+0x00000167 R_X86_64_PC32 study_fn_0 S=0x0000000000401100 A=-4 P=0x0000000000401167 value=-107
+    rela2 .text+0x00000260 R_X86_64_PC32 study_fn_1 S=0x0000000000401190 A=-4 P=0x0000000000401260 value=-212
+    rela3 .text+0x000002d9 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004012d9 value=-717
+    rela4 .text+0x000002ed R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004012ed value=-737
+    rela5 .text+0x00000301 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401301 value=-757
+    rela6 .text+0x00000325 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401325 value=-793
+    rela7 .text+0x0000033b R_X86_64_PC32 study_fn_0 S=0x0000000000401100 A=-4 P=0x000000000040133b value=-575
+    rela8 .text+0x0000034c R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x000000000040134c value=-832
+    rela9 .text+0x000003bd R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004013bd value=-945
+    rela10 .text+0x000003d8 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004013d8 value=-972
+    rela11 .text+0x00000436 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401436 value=-1066
+    rela12 .text+0x00000451 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401451 value=-1093
+    rela13 .text+0x000004af R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004014af value=-1187
+    rela14 .text+0x000004ca R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004014ca value=-1214
+    rela15 .text+0x00000528 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401528 value=-1308
+    rela16 .text+0x00000543 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401543 value=-1335
+    rela17 .text+0x000005a1 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004015a1 value=-1429
+    rela18 .text+0x000005bc R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x00000000004015bc value=-1456
+    rela19 .text+0x0000061c R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x000000000040161c value=-1552
+    rela20 .text+0x00000637 R_X86_64_PC32 study_rt_print_i32 S=0x0000000000401010 A=-4 P=0x0000000000401637 value=-1579
+}

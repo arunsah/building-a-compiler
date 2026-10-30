@@ -1,0 +1,3 @@
+db3c6b481c6b230e96217385a0b1af845f227c3dcc1eaffa05833c713cf56ff9  operations.executable.bin
+6eb8ac9ddecd3e218be1893ed6dac9ee77253a3bb6724ce5e4fef463722131f4  return-42.executable.bin
+3f5d7588a652d43c840f7905921bf6bc40d8db478ce50df6b492997e1f19f849  sum-to.executable.bin

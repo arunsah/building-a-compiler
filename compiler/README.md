@@ -182,16 +182,19 @@ tests independently inspect our object and executable, run the tool-free
 default path and all three reference paths, compare native output with the
 interpreter, and check non-zero Study results.
 
-To retain a small environment and verification record in a new directory:
+To retain the current environment and bounded-linker verification record in a
+new directory:
 
 ```sh
-./compiler/record-ir-evidence.sh NEW_OUTPUT_DIRECTORY
+./compiler/record-bounded-linker-evidence.sh NEW_OUTPUT_DIRECTORY
 ```
 
-The recorder uses a temporary build directory, runs the strict and sanitizer
-tests, saves one IR dump and one interpreted result, and writes checksums. Review
-`environment.txt` before committing it; environment records must not contain a
-private hostname, account identifier, credential, or token.
+The recorder uses temporary build directories, runs the strict and sanitizer
+tests, retains the executable dump and bytes for all three representative
+programs, performs the native and reference checks when running on Linux
+x86-64, and writes checksums. Review `environment.txt` before committing it;
+environment records must not contain a private hostname, account identifier,
+credential, or token.
 
 The earlier driver records remain under
 [`evidence/03-driver-source`](evidence/03-driver-source). The current macOS
@@ -218,6 +221,9 @@ The first instruction-encoding and relative-fixup records are under
 
 The ELF64 relocatable-object and call-relocation records are under
 [`evidence/11-elf-object`](evidence/11-elf-object).
+
+The bounded-linker and final static-executable records are under
+[`evidence/12-bounded-linker`](evidence/12-bounded-linker).
 
 The bounded-linker and final executable records will be retained under
 `evidence/12-bounded-linker` after cross-host and native review.

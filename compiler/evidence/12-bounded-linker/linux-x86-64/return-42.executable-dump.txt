@@ -1,0 +1,15 @@
+elf64-executable x86-64 [bytes=4864, entry=0x0000000000401000, segments=2, sections=5] {
+  header @0x00000000 program-headers=0x00000040 section-headers=0x000011c0
+  segment p0 LOAD @0x00000000 vaddr=0x0000000000400000 filesz=4376 flags=RX align=4096
+  segment p1 GNU_STACK size=0 flags=RW align=16
+  section s1 .text @0x00001000 vaddr=0x0000000000401000 size=280 align=16 flags=AX
+  section s2 .symtab @0x00001118 entries=4 link=s3
+  section s3 .strtab @0x00001178 size=38
+  section s4 .shstrtab @0x0000119e size=33
+  symbols:
+    sym1 study_rt_print_i32 local function 0x0000000000401010 size=236
+    sym2 study_fn_0 local function 0x0000000000401100 size=24
+    sym3 _start global function 0x0000000000401000 size=16
+  applied relocations:
+    rela0 .text+0x00000001 R_X86_64_PC32 study_fn_0 S=0x0000000000401100 A=-4 P=0x0000000000401001 value=251
+}
